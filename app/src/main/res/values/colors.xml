@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#d64743</color>
+    <color name="colorPrimaryDark">#ee534f</color>
+
+    <color name="colorAccent">#ee534f</color>
+
+
+
+    <color name="button_disable_color_light">#42000000</color>
+    <color name="cardview_light_background">#fffafafa</color>
+    <color name="cardview_dark_background">#ff202020</color>
+    <color name="cardview_shadow_start_color">#37000000</color>
+    <color name="cardview_shadow_end_color">#03000000</color>
+    <color name="design_fab_stroke_top_outer_color">#2effffff</color>
+    <color name="design_fab_stroke_top_inner_color">#1affffff</color>
+    <color name="design_fab_stroke_end_outer_color">#0f000000</color>
+    <color name="design_fab_stroke_end_inner_color">#0a000000</color>
+    <color name="design_fab_shadow_start_color">#44000000</color>
+    <color name="design_fab_shadow_mid_color">#14000000</color>
+    <color name="design_fab_shadow_end_color">@android:color/transparent</color>
+    <color name="grey_light">#ff1e1e1e</color>
+    <color name="gradation_04_light">#ffe0e0e0</color>
+    <color name="gradation_05_light">#ffbdbdbd</color>
+    <color name="gradation_03_dark">#ffeeeeee</color>
+
+    <color name="onePlusAccentColor_device_default_dark">@color/system_default_blue_300</color>
+    <color name="grey">@color/grey_light</color>
+    <color name="gradation_05">@color/gradation_05_light</color>
+
+    <color name="system_default_blue_300">#ff5789c6</color>
+    <color name="actionbar_wood">#ffb3aa86</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="foreground_material_dark">@color/white</color>
+    <color name="foreground_material_light">@color/black</color>
+    <color name="background_material_dark">@color/material_grey_850</color>
+    <color name="background_material_light">@color/material_grey_50</color>
+    <color name="background_floating_material_dark">@color/material_grey_800</color>
+    <color name="background_floating_material_light">@color/white</color>
+    <color name="primary_material_dark">@color/material_grey_900</color>
+    <color name="primary_material_light">@color/material_grey_100</color>
+    <color name="primary_dark_material_dark">@color/black</color>
+    <color name="primary_dark_material_light">@color/material_grey_600</color>
+    <color name="accent_material_light">@color/material_deep_teal_500</color>
+    <color name="accent_material_dark">@color/material_deep_teal_200</color>
+    <color name="button_material_dark">#ff5a595b</color>
+    <color name="button_material_light">#ffd6d7d7</color>
+    <color name="switch_thumb_normal_material_dark">#ffbdbdbd</color>
+    <color name="switch_thumb_normal_material_light">#fff1f1f1</color>
+    <color name="switch_thumb_disabled_material_dark">#ff616161</color>
+    <color name="switch_thumb_disabled_material_light">#ffbdbdbd</color>
+    <color name="primary_text_default_material_light">#de000000</color>
+    <color name="secondary_text_default_material_light">#8a000000</color>
+    <color name="primary_text_default_material_dark">#ffffffff</color>
+    <color name="secondary_text_default_material_dark">#b3ffffff</color>
+    <color name="material_grey_900">#ff212121</color>
+    <color name="material_grey_850">#ff303030</color>
+    <color name="material_grey_800">#ff424242</color>
+    <color name="material_grey_600">#ff757575</color>
+    <color name="material_grey_300">#ffe0e0e0</color>
+    <color name="material_grey_100">#fff5f5f5</color>
+    <color name="material_grey_50">#fffafafa</color>
+    <color name="material_deep_teal_200">#ff80cbc4</color>
+    <color name="material_deep_teal_500">#ff009688</color>
+    <color name="material_blue_grey_800">#ff37474f</color>
+    <color name="material_blue_grey_900">#ff263238</color>
+    <color name="material_blue_grey_950">#ff21272b</color>
+
+    <color name="grey_ebebeb">#ebebeb</color>
+
+
+    <color name="titleColor">#ff202124</color>
+
+    <!--takem from filemanager app-->
+
+    <color name="strgtextclr">#89000000</color>
+    <color name="white">#ffffff</color>
+    <color name="color_icon">#26A69A</color>
+    <color name="settings_separator">#eeeded</color>
+
+    <color name="switch_uncheck_color">#cccccc</color>
+
+    <color name="tab_background_selected">#cccccc</color>
+    <color name="tab_background_unselected">#e1e1e1</color>
+</resources>
