@@ -70,6 +70,7 @@
                 android:layout_height="wrap_content" />
 
             <!--android:buttonTint="@color/checkbox_tint"-->
+
             <CheckBox
                 android:id="@+id/chbx"
                 android:layout_alignParentRight="true"

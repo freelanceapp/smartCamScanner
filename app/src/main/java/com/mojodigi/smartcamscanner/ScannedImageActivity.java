@@ -1,30 +1,43 @@
 package com.mojodigi.smartcamscanner;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+//import android.widget.Toolbar;
 
 
 import com.mojodigi.smartcamscanner.AsyncTasks.createFileAsyncTask;
 import com.mojodigi.smartcamscanner.Constants.Constants;
 import com.mojodigi.smartcamscanner.Util.Utility;
+import com.mojodigi.smartcamscanner.filterUtils.ThumbnailCallback;
+import com.mojodigi.smartcamscanner.filterUtils.ThumbnailItem;
+import com.mojodigi.smartcamscanner.filterUtils.ThumbnailsAdapter;
+import com.mojodigi.smartcamscanner.filterUtils.ThumbnailsManager;
+import com.zomato.photofilters.SampleFilters;
+import com.zomato.photofilters.imageprocessors.Filter;
+
+import java.util.List;
 
 
-public class ScannedImageActivity extends AppCompatActivity implements createFileAsyncTask.AsyncResponse {
-
-
+public class ScannedImageActivity extends AppCompatActivity implements createFileAsyncTask.AsyncResponse , ThumbnailCallback {
 
     Context mContext;
     Toolbar toolbar;
@@ -32,16 +45,25 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
     int REQUEST_CODE_SCAN=100;
     public static ScannedImageActivity instance;
     private Bitmap imageBitmap;
+    private Bitmap imageBitmapTosave;
     EditText fileNameEditText;
 
+
+
+    private RecyclerView thumbListView;
+    static {
+        System.loadLibrary("NativeImageProcessor");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-         setContentView(R.layout.scanned_image_activity);
+         setContentView(R.layout.scanned_image_activity2);
          mContext=ScannedImageActivity.this;
          instance=this;
 
+
+         Utility.setActivityTitle(mContext, "Scanned file");
          if(Constants.imageBitmap!=null) {
              imageBitmap = Constants.imageBitmap;
          }
@@ -51,91 +73,93 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
          }
 
         private void initComponents() {
-        scannedImage=findViewById(R.id.scannedImage);
-            fileNameEditText=findViewById(R.id.fileNameEditText);
-            fileNameEditText.setText(Utility.getFileName());
+
+              thumbListView = (RecyclerView) findViewById(R.id.thumbnails);
+              scannedImage=findViewById(R.id.scannedImage);
+             fileNameEditText=findViewById(R.id.fileNameEditText);
+             fileNameEditText.setText(Utility.getFileName());
+            fileNameEditText.setSelection(fileNameEditText.getText().toString().length());
+
 
         if(imageBitmap!=null)
             scannedImage.setImageBitmap(imageBitmap);
 
-      
+
+
+            initHorizontalList();
         }
 
 
-
-
-   /* protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-
-        if (requestCode == REQUEST_CODE_SCAN && resultCode == Activity.RESULT_OK) {
-            String imgPath = data.getStringExtra(ScanActivity.RESULT_IMAGE_PATH);
-            imageBitmap = Utils.getBitmapFromLocation(imgPath);
-            scannedImage.setImageBitmap(imageBitmap);
-            scannedImage.setVisibility(View.VISIBLE);
-
-
-
-//            Uri uri = data.getExtras().getParcelable(ScanConstants.SCANNED_RESULT);
-//            Bitmap bitmap = null;
-//            try {
-//                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-//                getContentResolver().delete(uri, null, null);
-//                viewHolder.image.setImageBitmap(bitmap);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-        }
-
-
-        // to read qr code
-
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (result != null) {
-            String readData="";
-            //if qrcode has nothing in it
-            if (result.getContents() == null) {
-                //Toast.makeText(this, "Result Not Found", Toast.LENGTH_LONG).show();
-            } else {
-                //if qr contains data
-                try {
-                    //converting the data to json
-                    JSONObject obj = new JSONObject(result.getContents());
-                    //setting values to textviews
-                   *//* textViewName.setText(obj.getString("name"));
-
-                   textViewAddress.setText(obj.getString("address"));*//*
-
-                   Utility.dispToast(mContext, obj.toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    //if control comes here
-                    //that means the encoded format not matches
-                    //in this case you can display whatever data is available on the qrcode
-                    //to a toast
-                    Toast.makeText(this, result.getContents(), Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-
-        // to read qr code
-
-
-
-
-
-
-    }*/
-
-
-
-
-
-    @Override
+        @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.scanned_image_menu, menu);
         return true;
+    }
+
+    private void initHorizontalList() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        layoutManager.scrollToPosition(0);
+        thumbListView.setLayoutManager(layoutManager);
+        thumbListView.setHasFixedSize(true);
+        bindDataToAdapter();
+    }
+
+    private void bindDataToAdapter() {
+        final Context context = this.getApplication();
+        Handler handler = new Handler();
+        Runnable r = new Runnable() {
+            public void run() {
+                //Bitmap thumbImage = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.photo), 640, 640, false);
+                Bitmap thumbImage = Bitmap.createScaledBitmap(imageBitmap, 640, 640, false);
+                //Bitmap thumbImage =imageBitmap;
+                imageBitmapTosave=imageBitmap;
+                ThumbnailItem t1 = new ThumbnailItem();
+                ThumbnailItem t2 = new ThumbnailItem();
+                ThumbnailItem t3 = new ThumbnailItem();
+                ThumbnailItem t4 = new ThumbnailItem();
+                ThumbnailItem t5 = new ThumbnailItem();
+                ThumbnailItem t6 = new ThumbnailItem();
+
+                t1.image = thumbImage;
+                t2.image = thumbImage;
+                t3.image = thumbImage;
+                t4.image = thumbImage;
+                t5.image = thumbImage;
+                t6.image = thumbImage;
+                ThumbnailsManager.clearThumbs();
+                ThumbnailsManager.addThumb(t1); // Original Image
+
+                t2.filter = SampleFilters.getStarLitFilter();
+                ThumbnailsManager.addThumb(t2);
+
+                t3.filter = SampleFilters.getBlueMessFilter();
+                ThumbnailsManager.addThumb(t3);
+
+                t4.filter = SampleFilters.getAweStruckVibeFilter();
+                ThumbnailsManager.addThumb(t4);
+
+                t5.filter = SampleFilters.getLimeStutterFilter();
+                ThumbnailsManager.addThumb(t5);
+
+                t6.filter = SampleFilters.getNightWhisperFilter();
+                ThumbnailsManager.addThumb(t6);
+
+
+
+                //
+
+                //
+
+                List<ThumbnailItem> thumbs = ThumbnailsManager.processThumbs(context);
+
+                ThumbnailsAdapter adapter = new ThumbnailsAdapter(thumbs, (ThumbnailCallback) instance);
+                thumbListView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+            }
+        };
+        handler.post(r);
     }
 
     @Override
@@ -168,7 +192,11 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
     }
 
 
-
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 
 
     private void shareDialog()
@@ -214,16 +242,17 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
         final Dialog dialog = new Dialog(mContext);
         dialog.setContentView(R.layout.dialog_save);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        RelativeLayout savePdf=dialog.findViewById(R.id.save1Layout);
-        RelativeLayout saveImage=dialog.findViewById(R.id.save2Layout);
-        TextView cancelShare=dialog.findViewById(R.id.cancelSave);
+       ImageView savePdf=dialog.findViewById(R.id.savepdf);
+       ImageView saveImage=dialog.findViewById(R.id.saveimage);
+        Button cancelSave =dialog.findViewById(R.id.cancelSave);
+
         savePdf.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 if(fileNameEditText.getText().toString().length()>0) {
-                    if (imageBitmap != null) {
-                        new createFileAsyncTask(mContext, instance, instance, fileNameEditText.getText().toString().trim(), imageBitmap, Constants.TYPE_PDF).execute();
+                    if (imageBitmapTosave != null) {
+                        new createFileAsyncTask(mContext, instance, instance, fileNameEditText.getText().toString().trim(), imageBitmapTosave, Constants.TYPE_PDF).execute();
                     }
                 }else
                 {
@@ -261,7 +290,7 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
 
             }
         });
-        cancelShare.setOnClickListener(new View.OnClickListener() {
+        cancelSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -283,5 +312,15 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
     public void onFailure() {
         Utility.dispToast(mContext, "Error while creating File");
         finish();
+    }
+
+    @Override
+    public void onThumbnailClick(Filter filter) {
+
+      // scannedImage.setImageBitmap(filter.processFilter(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.photo), 640, 640, false)));
+        //scannedImage.setImageBitmap(filter.processFilter(imageBitmap));
+        scannedImage.setImageBitmap(filter.processFilter(Bitmap.createScaledBitmap(imageBitmap, 640,640 ,false )));
+        imageBitmapTosave=filter.processFilter(Bitmap.createScaledBitmap(imageBitmap, 640,640 ,false ));
+
     }
 }

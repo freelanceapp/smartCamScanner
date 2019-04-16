@@ -15,7 +15,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -23,6 +22,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -33,6 +33,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -42,35 +44,25 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.mojodigi.smartcamscanner.Adapter.PagerAdapter;
-import com.mojodigi.smartcamscanner.AsyncTasks.CreatePdf;
-import com.mojodigi.smartcamscanner.AsyncTasks.createFileAsyncTask;
 import com.mojodigi.smartcamscanner.Constants.Constants;
-import com.mojodigi.smartcamscanner.Interfaces.OnPDFCreatedInterface;
+import com.mojodigi.smartcamscanner.Fragments.FolderFragment;
 import com.mojodigi.smartcamscanner.Model.ImageToPDFOptions;
 import com.mojodigi.smartcamscanner.Util.Utility;
-import com.mojodigi.smartcamscanner.pdfUtils.PageSizeUtils;
 import com.scanlibrary.ScanActivity;
 import com.scanlibrary.Utils;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Transformation;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
-import com.zhihu.matisse.filter.Filter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-
-import jp.wasabeef.picasso.transformations.GrayscaleTransformation;
 
 import static com.mojodigi.smartcamscanner.Constants.Constants.STORAGE_LOCATION;
 import static com.mojodigi.smartcamscanner.Util.StringUtils.getDefaultStorageLocation;
-import static com.mojodigi.smartcamscanner.pdfUtils.ImageUtils.mImageScaleType;
 
 
 public class MainActivity extends AppCompatActivity
@@ -104,6 +96,8 @@ public class MainActivity extends AppCompatActivity
     private String mHomePath;
     private ImageToPDFOptions mPdfOptions;
     private SharedPreferences mSharedPreferences;
+    PagerAdapter adapter;
+    ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +109,9 @@ public class MainActivity extends AppCompatActivity
         instance=this;
         setSupportActionBar(toolbar);
         askForPermission();
+
+
+                  getSupportActionBar().setTitle("Home");
 
         //init pdf vars
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -248,8 +245,8 @@ public class MainActivity extends AppCompatActivity
 
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+        viewPager = (ViewPager) findViewById(R.id.pager);
+         adapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -270,7 +267,24 @@ public class MainActivity extends AppCompatActivity
         });
 
         setFab();
+        changeTabsFont(tabLayout);
+        createSystemDirectory();
 
+    }
+
+    private void changeTabsFont(TabLayout tabLayout) {
+        ViewGroup vg = (ViewGroup) tabLayout.getChildAt(0);
+        int tabsCount = vg.getChildCount();
+        for (int j = 0; j < tabsCount; j++) {
+            ViewGroup vgTab = (ViewGroup) vg.getChildAt(j);
+            int tabChildsCount = vgTab.getChildCount();
+            for (int i = 0; i < tabChildsCount; i++) {
+                View tabViewChild = vgTab.getChildAt(i);
+                if (tabViewChild instanceof TextView) {
+                    ((TextView) tabViewChild).setTypeface(Utility.typeFace_Gotham_Bold(mContext));
+                }
+            }
+        }
     }
 
     private void setFab() {
@@ -300,6 +314,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
     }
 
     private void onScanButtonClicked() {
@@ -493,7 +509,7 @@ public class MainActivity extends AppCompatActivity
 
                 case R.id.action_create_folder:
                 //Utility.dispToast(mContext, "create folder");
-
+                  createFolderDialog();
                 break;
 
         }
@@ -503,6 +519,87 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    private void createFolderDialog() {
+
+        final Dialog dialog = new Dialog(mContext);
+        dialog.setContentView(R.layout.dialog_create_folder);
+        dialog.show();
+
+
+        TextView View_create=dialog.findViewById(R.id.View_create);
+        TextView View_cancel=dialog.findViewById(R.id.View_cancel);
+        final EditText folderName_Edit=dialog.findViewById(R.id.Edit_folder);
+
+
+        View_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        View_create.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                if(Utility.checkOrCreateParentDirectory()) {
+                    File file = new File(Constants.parentfolder + "/" + folderName_Edit.getText().toString().trim());
+
+                    if (file.mkdir())
+                    {
+                        Utility.dispToast(mContext,getResources().getString(R.string.folder_success));
+                        dialog.dismiss();
+                        Fragment page = (Fragment) adapter.instantiateItem(viewPager,viewPager.getCurrentItem());
+                        ((FolderFragment)page).updateFolderList();
+
+                    }
+                    else
+                    {
+                        Utility.dispToast(mContext,getResources().getString(R.string.folder_failure) );
+                        dialog.dismiss();
+                    }
+
+
+                }
+
+
+            }
+        });
+
+    }
+
+    private void  createSystemDirectory()
+    {
+        if(Utility.checkOrCreateParentDirectory())
+        {
+
+
+            String AllFiles=Constants.allFilesFolder;
+            File allFileFolder=new File(AllFiles);
+            if (!allFileFolder.exists())
+                allFileFolder.mkdir();
+
+            String pathTopdf = Constants.pdfFolderName;
+              File pdfFolder = new File(pathTopdf);
+              if (!pdfFolder.exists())
+                pdfFolder.mkdir();
+
+
+
+              String pathToImages=Constants.imageFolderName;
+              File imgFolder=new File(pathToImages);
+               if (!imgFolder.exists())
+                   imgFolder.mkdir();
+
+
+
+
+        }
+
+
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -510,7 +607,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         switch (id)
         {
-            case R.id.nav_camera:
+            case R.id.nav_gallery:
 
                 Matisse.from(MainActivity.this)
                         .choose(MimeType.ofImage())
@@ -518,13 +615,13 @@ public class MainActivity extends AppCompatActivity
                         .maxSelectable(1000)
                         //.addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K))
                         //.gridExpectedSize(getResources().getDimensionPixelSize(R.dimen.grid_expected_size))
-                        .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                        .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
                         .thumbnailScale(0.85f)
                         .imageEngine(new GlideEngine())
                         .forResult(REQUEST_CODE_CHOOSE);
 
                 break;
-            case R.id.nav_files:
+           /* case R.id.nav_files:
                 Intent intent =new Intent(this,Activity_List_Pdfs.class);
                 startActivity(intent);
                 break;
@@ -536,10 +633,10 @@ public class MainActivity extends AppCompatActivity
                 Utility.dispToast(mContext,"Images");
                 Intent inten =new Intent(this,fileTabActivity.class);
                 startActivity(inten);
-                break;
+                break;*/
             case R.id.nav_share:
-                shareDialog();
-                break;
+                  shareApp();
+                 break;
 
             case  R.id.nav_privacy:
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.privacyUrl));
@@ -555,6 +652,19 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void shareApp() {
+        Intent share = new Intent(android.content.Intent.ACTION_SEND);
+        share.setType("text/plain");
+        share.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        // Add data to the intent, the receiving app will decide
+        // what to do with it.
+        share.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.app_name));
+        share.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=com.mojodigi.smartcamscanner&hl=en");
+        startActivity(Intent.createChooser(share,  getResources().getString(R.string.app_name)));
+
+
     }
 
     private void shareDialog()

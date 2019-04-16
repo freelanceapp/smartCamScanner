@@ -7,23 +7,19 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <android.support.design.widget.AppBarLayout
-        android:visibility="gone"
+    <EditText
+      android:layout_marginTop="@dimen/dp10"
+        android:layout_marginBottom="@dimen/dp10"
+        android:text="fileName"
+        android:id="@+id/fileName"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize"
-            />
-
-    </android.support.design.widget.AppBarLayout>
+        android:layout_height="wrap_content" />
 
     <LinearLayout
+        android:layout_below="@+id/fileName"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?android:attr/actionBarSize"
+
         android:orientation="vertical"
         tools:context=".activity.CropImageActivity">
 

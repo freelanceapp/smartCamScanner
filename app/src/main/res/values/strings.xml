@@ -34,6 +34,21 @@
     <string name="pdf_ext" translatable="false">.pdf</string>
     <string name="pdf_type" translatable="false">application/pdf</string>
     <string name="merge_file_select">Select a file</string>
+    <string name="actions_name">Enter file name</string>
+    <string name="actions_create">Create folder</string>
+    <string name="folder_success">folder created successfully</string>
+    <string name="file_success">file created successfully</string>
+    <string name="folder_failure">Error while folder creation</string>
+    <string name="file_failure">Error while file creation</string>
+    <string name="ok_txt">Ok</string>
+    <string name="actions_rename">Rename</string>
+    <string name="save">SAVE</string>
+    <string name="cancel">Cancel</string>
+    <string name="namerequired">Name is required</string>
+    <string name="emty_error">can not be empty</string>
+    <string name="create_txt">Create</string>
+    <string name="cancel_txt">Cancel</string>
+    <string name="addfolder_txt">Add folder</string>
     <string name="cropImage_activityTitle">Crop Image</string>
     <string name="previous_image_content_desc">Previous Image</string>
     <string name="showing_image">Showing %1$d of %2$d image(s)</string>

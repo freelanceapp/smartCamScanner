@@ -83,4 +83,11 @@
 
     <color name="tab_background_selected">#cccccc</color>
     <color name="tab_background_unselected">#e1e1e1</color>
+
+
+    <color name="thumb_background_color">#000000</color>
+    <color name="zomato_red">#a40100</color>
+    <color name="placeholder_background">#222322</color>
+
+    <color name="tickColor">#fff605</color>
 </resources>

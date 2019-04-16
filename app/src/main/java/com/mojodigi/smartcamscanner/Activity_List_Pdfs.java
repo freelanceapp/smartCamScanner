@@ -61,7 +61,7 @@ public class Activity_List_Pdfs extends AppCompatActivity implements AsynctaskUt
 
          initActivitycomponent();
          if(mContext!=null)
-         new AsynctaskUtility<pdfModel>(mContext,this,1).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+         new AsynctaskUtility<pdfModel>(mContext,this,Constants.REQUST_PDF_FILE).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
     }
 
@@ -69,6 +69,9 @@ public class Activity_List_Pdfs extends AppCompatActivity implements AsynctaskUt
 
         instance=this;
         mContext=Activity_List_Pdfs.this;
+
+        Utility.setActivityTitle(mContext,"Pdf files" );
+
         empty_view=findViewById(R.id.empty_view);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
@@ -483,6 +486,12 @@ public class Activity_List_Pdfs extends AppCompatActivity implements AsynctaskUt
             Toast.makeText(mContext, "No files to share", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     @Override

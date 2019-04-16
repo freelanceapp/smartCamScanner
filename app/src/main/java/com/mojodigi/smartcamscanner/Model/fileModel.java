@@ -8,6 +8,29 @@ public class fileModel
     String fileSize;
     String fileModifiedDate;
 
+    long dateToSort;
+    String fileMDate;
+
+    public String getFileMDate() {
+        return fileMDate;
+    }
+
+    public void setFileMDate(String fileMDate) {
+        this.fileMDate = fileMDate;
+    }
+
+
+
+    public long getDateToSort() {
+        return dateToSort;
+    }
+
+    public void setDateToSort(long dateToSort) {
+        this.dateToSort = dateToSort;
+    }
+
+
+
     public boolean getIsImgs() {
         return isImgs;
     }

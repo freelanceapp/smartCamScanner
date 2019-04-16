@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.sax.EndElementListener;
+import android.service.carrier.CarrierService;
 import android.util.Log;
 
 import com.mojodigi.smartcamscanner.Constants.Constants;
@@ -40,12 +41,16 @@ public class AsynctaskUtility<T> extends AsyncTask<Void, Void, ArrayList<T>> {
     boolean boolean_folder;
     public  T model_type;
     int fileStorageType;
-
+    ArrayList<fileModel> recentList = new ArrayList<>();
+    ArrayList<pdfModel> pdfList = new ArrayList<>();
+    ArrayList<fileModel> imgList = new ArrayList<>();
+    ArrayList<pdfModel> AllFileList = new ArrayList<>();
     public AsynctaskUtility(Context mContext, AsyncResponse delegate, int fileStorageType)
     {
         this.mContext=mContext;
         this.delegate=delegate;
         this.fileStorageType=fileStorageType;
+
         }
     @Override
     protected void onPreExecute() {
@@ -66,17 +71,21 @@ public class AsynctaskUtility<T> extends AsyncTask<Void, Void, ArrayList<T>> {
 
         switch (fileStorageType)
         {
-            case 1:
-                return  (ArrayList<T>)lstPdfFiles();
-
-            case 2:
-                return  (ArrayList<T>)lstRecentFiles();
-
-            case 3:
-                return  (ArrayList<T>)lstPdfFiles();
-
-                }
+            case Constants.REQUST_RECENT_FILE:
+                recentList.clear();
+                return  (ArrayList<T>)listRecentFiles(Constants.parentfolder+"/");
+            case Constants.REQUST_ALL_FILE:
+                AllFileList.clear();
+                return  (ArrayList<T>)listRecentFiles(Constants.parentfolder+"/");
+            case Constants.REQUST_PDF_FILE:
+                pdfList.clear();
+                return  (ArrayList<T>)listPdfFile(Constants.parentfolder+"/");
+            case Constants.REQUST_IMAGES_FILE:
+                imgList.clear();
+                    return  (ArrayList<T>)listImages(Constants.parentfolder+"/");
+        }
         return null;
+
 
 
     }
@@ -99,88 +108,136 @@ public class AsynctaskUtility<T> extends AsyncTask<Void, Void, ArrayList<T>> {
         }
 
 
+    public  ArrayList<fileModel> listImages(String directoryName) {
 
-  public ArrayList<pdfModel> lstPdfFiles()
-  {
-      ArrayList<pdfModel> pdfList =new ArrayList<>();
-      String rootPathStr=Constants.pdfFolderName+"/";
-      File rootPath = new File(rootPathStr);
 
-    if(rootPath.exists() && rootPath.isDirectory())
-    { File[] files = rootPath.listFiles();
-
-     for(int i=0;i<files.length;i++)
+        String rootPath = directoryName;
+        if (Utility.checkOrCreateParentDirectory())
         {
-            File f = files[i];
-            pdfModel model=new pdfModel();
-            model.setFileName(f.getName());
-            model.setFileSize(Utility.humanReadableByteCount(f.length(),true));
-            model.setFileModifiedDate(Utility.LongToDate((f.lastModified())));
-            model.setFilePath(f.getPath());
-            pdfList.add(model);
+            File directory = new File(rootPath);
+            // Get all files from a directory.
+            File[] fList = directory.listFiles();
+            if (fList != null)
+                for (File file : fList) {
+                    if (file.isFile()) {
+
+                        if(file.getAbsolutePath().endsWith(".jpg")) {
+                            fileModel model = new fileModel();
+                            model.setFileName(file.getName());
+                            model.setFileSize(Utility.humanReadableByteCount(file.length(), true));
+                            model.setFileModifiedDate(Utility.LongToDate((file.lastModified())));
+                            model.setFilePath(file.getPath());
+                            model.setDateToSort(file.lastModified());
+                            imgList.add(model);
+                        }
+
+                    } else if (file.isDirectory()) {
+                        listImages(file.getAbsolutePath());
+                    }
+                }
+
         }
-        return  pdfList;
-    }
-      else
-    {
-       return pdfList;
-    }
 
 
-  }
-
-    public ArrayList<fileModel> lstRecentFiles()
-
-    {
-        ArrayList<fileModel> recentList = new ArrayList<>();
-        String rootPathStr = Constants.pdfFolderName + "/";
-        File rootPath = new File(rootPathStr);
-
-        if (rootPath.exists() && rootPath.isDirectory()) {
-            File[] files = rootPath.listFiles();
-
-            for (int i = 0; i < files.length; i++) {
-                File f = files[i];
-                fileModel model = new fileModel();
-                model.setFileName(f.getName());
-                model.setFileSize(Utility.humanReadableByteCount(f.length(), true));
-                model.setFileModifiedDate(Utility.LongToDate((f.lastModified())));
-                model.setFilePath(f.getPath());
-                recentList.add(model);
+        // sort  t0  get  most  recent files on top
+        Collections.sort(imgList, new Comparator<fileModel>() {
+            public int compare(fileModel o1, fileModel o2) {
+                return Utility.longToDate(o2.getDateToSort()).compareTo(Utility.longToDate(o1.getDateToSort()));
             }
-            ArrayList<fileModel> imgList=getImgs();
-            recentList.addAll(imgList);
-            return recentList;
-        } else {
-            return recentList;
-        }
+        });
 
-        }
 
-    private ArrayList<fileModel> getImgs() {
-        ArrayList<fileModel> recentList = new ArrayList<>();
-        String rootPathStr = Constants.imageFolderName + "/";
-        File rootPath = new File(rootPathStr);
-
-        if (rootPath.exists() && rootPath.isDirectory()) {
-            File[] files = rootPath.listFiles();
-
-            for (int i = 0; i < files.length; i++) {
-                File f = files[i];
-                fileModel model = new fileModel();
-                model.setFileName(f.getName());
-                model.setFileSize(Utility.humanReadableByteCount(f.length(), true));
-                model.setFileModifiedDate(Utility.LongToDate((f.lastModified())));
-                model.setFilePath(f.getPath());
-                model.setIsImgs(true);
-                recentList.add(model);
-            }
-
-            return recentList;
-        } else {
-            return recentList;
-        }
-
+        return imgList ;
 
     }
+
+    public  ArrayList<pdfModel> listPdfFile(String directoryName) {
+
+
+        String rootPath = directoryName;
+        if (Utility.checkOrCreateParentDirectory())
+        {
+            File directory = new File(rootPath);
+            // Get all files from a directory.
+            File[] fList = directory.listFiles();
+            if (fList != null)
+                for (File file : fList) {
+                    if (file.isFile()) {
+
+                        if(file.getAbsolutePath().endsWith(".pdf")) {
+                            pdfModel model = new pdfModel();
+                            model.setFileName(file.getName());
+                            model.setFileSize(Utility.humanReadableByteCount(file.length(), true));
+                            model.setFileModifiedDate(Utility.LongToDate((file.lastModified())));
+                            model.setFilePath(file.getPath());
+                            model.setDateToSort(file.lastModified());
+                            pdfList.add(model);
+                        }
+
+                    } else if (file.isDirectory()) {
+                        listPdfFile(file.getAbsolutePath());
+                    }
+                }
+
+        }
+
+
+        // sort  t0  get  most  recent files on top
+        Collections.sort(pdfList, new Comparator<pdfModel>() {
+            public int compare(pdfModel o1, pdfModel o2) {
+                return Utility.longToDate(o2.getDateToSort()).compareTo(Utility.longToDate(o1.getDateToSort()));
+            }
+        });
+
+
+        return pdfList ;
+
+    }
+
+    public  ArrayList<fileModel> listRecentFiles(String directoryName) {
+
+
+        String rootPath = directoryName;
+        if (Utility.checkOrCreateParentDirectory())
+        {
+            File directory = new File(rootPath);
+            // Get all files from a directory.
+            File[] fList = directory.listFiles();
+            if (fList != null)
+                for (File file : fList) {
+                    if (file.isFile()) {
+
+                        fileModel model = new fileModel();
+                        model.setFileName(file.getName());
+                        model.setFileSize(Utility.humanReadableByteCount(file.length(), true));
+                        model.setFileModifiedDate(Utility.LongToDate((file.lastModified())));
+                        model.setFilePath(file.getPath());
+                        model.setDateToSort(file.lastModified());
+                        if(file.getAbsolutePath().endsWith("jpg"))
+                        model.setIsImgs(true);
+                        else
+                            model.setIsImgs(false);
+
+                        recentList.add(model);
+
+                    } else if (file.isDirectory()) {
+                        listRecentFiles(file.getAbsolutePath());
+                    }
+                }
+
+        }
+
+
+      // sort  t0  get  most  recent files on top
+        Collections.sort(recentList, new Comparator<fileModel>() {
+                    public int compare(fileModel o1, fileModel o2) {
+                        return Utility.longToDate(o2.getDateToSort()).compareTo(Utility.longToDate(o1.getDateToSort()));
+                    }
+                });
+
+
+        return recentList ;
+
+    }
+
 }

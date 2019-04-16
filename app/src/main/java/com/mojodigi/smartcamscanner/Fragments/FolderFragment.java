@@ -1,9 +1,7 @@
 package com.mojodigi.smartcamscanner.Fragments;
 
-
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,73 +16,55 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.mojodigi.smartcamscanner.Activity_File_List;
+import com.mojodigi.smartcamscanner.Adapter.MultiSelectAdapter_Folder;
 import com.mojodigi.smartcamscanner.Adapter.MultiSelectAdapter_Recent;
-import com.mojodigi.smartcamscanner.AsyncTasks.AsynctaskUtility;
-import com.mojodigi.smartcamscanner.AsyncTasks.deleteFileAsyncTask;
+import com.mojodigi.smartcamscanner.AsyncTasks.getFolderAsyncTask;
 import com.mojodigi.smartcamscanner.Constants.Constants;
 import com.mojodigi.smartcamscanner.Model.fileModel;
-import com.mojodigi.smartcamscanner.Model.pdfModel;
-import com.mojodigi.smartcamscanner.PDFViewActivity;
+import com.mojodigi.smartcamscanner.Model.folder_Model;
 import com.mojodigi.smartcamscanner.R;
 import com.mojodigi.smartcamscanner.Util.AlertDialogHelper;
 import com.mojodigi.smartcamscanner.Util.RecyclerItemClickListener;
 import com.mojodigi.smartcamscanner.Util.Utility;
 
-import java.io.File;
-import java.io.InterruptedIOException;
 import java.util.ArrayList;
 
-public class RecentFragment extends Fragment  implements MultiSelectAdapter_Recent.recentListener ,AsynctaskUtility.AsyncResponse, AlertDialogHelper.AlertDialogListener ,deleteFileAsyncTask.deleteListener {
-
+public class FolderFragment extends Fragment implements getFolderAsyncTask.foldetlistListener ,MultiSelectAdapter_Folder.folderListener,AlertDialogHelper.AlertDialogListener  {
 
 
     RecyclerView recyclerView;
-    MultiSelectAdapter_Recent multiSelectAdapter;
+    Context mContext;
+    MultiSelectAdapter_Folder multiSelectAdapter;
+    ArrayList<folder_Model> folder_List = new ArrayList<>();
+    ArrayList<folder_Model> multiselect_list = new ArrayList<>();
 
-    ArrayList<fileModel> recent_ImgList = new ArrayList<>();
-    ArrayList<fileModel> multiselect_list = new ArrayList<>();
+
+    TextView nodataFound;
 
     ActionMode mActionMode;
     boolean isMultiSelect = false;
     Menu context_menu;
-    boolean isUnseleAllEnabled = false;
-    private fileModel fileTorename;
-    private  int renamePosition;
     AlertDialogHelper alertDialogHelper;
-    //TextView nodataFound;
-    ImageView nodataFound;
+    boolean isUnseleAllEnabled = false;
 
-  Context mContext;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragmnet_recentfile, container, false);
+        return inflater.inflate(R.layout.fragmnet_allfolderfile, container, false);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-            mContext=getActivity();
-
-
-
-
-            }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
         }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mContext=getActivity();
-        alertDialogHelper =new AlertDialogHelper(getActivity(),this);
         recyclerView =view.findViewById(R.id.recycler_view);
         nodataFound=view.findViewById(R.id.nodataFound);
 
@@ -104,7 +84,7 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
             @Override
             public void onItemLongClick(View view, int position) {
                 if (!isMultiSelect) {
-                    multiselect_list = new ArrayList<fileModel>();
+                    multiselect_list = new ArrayList<folder_Model>();
                     isMultiSelect = true;
 
                     if (mActionMode == null) {
@@ -119,8 +99,8 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
         }));
 
 
-        }
 
+    }
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 
@@ -152,20 +132,20 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
 
                 case R.id.action_rename:
                     if(multiselect_list.size()==1)
-                      //  Utility.fileRenameDialog(mcontext,multiselect_list.get(0).getFilePath(),Constants.DOCUMENT,false);
-                    return  true;
+                        //  Utility.fileRenameDialog(mcontext,multiselect_list.get(0).getFilePath(),Constants.DOCUMENT,false);
+                        return  true;
                 case R.id.action_delete:
                     if(multiselect_list.size()>=1) {
                         int mFileCount = multiselect_list.size();
                         String msgDeleteFile = mFileCount > 1 ? mFileCount + " " + getResources().getString(R.string.delfiles) : mFileCount + " " + getResources().getString(R.string.delfile);
-                        alertDialogHelper.showAlertDialog("", "Delete file"+" ("+msgDeleteFile+")", "DELETE", "CANCEL", 1, true);
+                        alertDialogHelper.showAlertDialog("", "Delete Image"+" ("+msgDeleteFile+")", "DELETE", "CANCEL", 1, true);
                     }
                     return true;
                 case R.id.action_select:
-                   /* if(recent_ImgList.size()==multiselect_list.size() || isUnseleAllEnabled==true)
+                    if(folder_List.size()==multiselect_list.size() || isUnseleAllEnabled==true)
                         unSelectAll();
                     else
-                        selectAll();*/
+                        selectAll();
                     return  true;
                 case  R.id.action_Share:
                     //shareMultipleDocsWithNoughatAndAll();
@@ -190,22 +170,116 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
         public void onDestroyActionMode(ActionMode mode) {
             mActionMode = null;
             isMultiSelect = false;
-            multiselect_list = new ArrayList<fileModel>();
+            multiselect_list = new ArrayList<folder_Model>();
             refreshAdapter();
         }
     };
 
+    private void unSelectAll()
+    {
+        if (mActionMode != null)
+        {
+            multiselect_list.clear();
+
+            if (multiselect_list.size() >= 0)
+                mActionMode.setTitle("" + multiselect_list.size());
+            else
+                mActionMode.setTitle("");
+
+            //to change  the unselectAll  menu  to  selectAll
+            selectMenuChnage();
+            //to change  the unselectAll  menu  to  selectAll
+
+            if (mActionMode != null) {
+                mActionMode.finish();
+            }
+
+
+
+            refreshAdapter();
+
+        }
+    }
+
+    private void selectAll()
+    {
+        if (mActionMode != null)
+        {
+            multiselect_list.clear();
+
+            for(int i=0;i<folder_List.size();i++)
+            {
+                if(!multiselect_list.contains(multiselect_list.contains(folder_List.get(i))))
+                {
+                    multiselect_list.add(folder_List.get(i));
+                }
+            }
+            if (multiselect_list.size() > 0)
+                mActionMode.setTitle("" + multiselect_list.size());
+            else
+                mActionMode.setTitle("");
+
+            refreshAdapter();
+            //to change  the unselectAll  menu  to  selectAll
+            selectMenuChnage();
+            //to change  the unselectAll  menu  to  selectAll
+
+        }
+    }
+
+    private void selectMenuChnage()
+    {
+        if(context_menu!=null)
+        {
+            if(folder_List.size()==multiselect_list.size()) {
+                for (int i = 0; i < context_menu.size(); i++) {
+                    MenuItem item = context_menu.getItem(i);
+                    if (item.getTitle().toString().equalsIgnoreCase(getResources().getString(R.string.menu_selectAll))) {
+                        item.setTitle(getResources().getString(R.string.menu_unselectAll));
+                        isUnseleAllEnabled=true;
+                    }
+                }
+            }
+            else {
+
+                for (int i = 0; i < context_menu.size(); i++) {
+                    MenuItem item = context_menu.getItem(i);
+                    if (item.getTitle().toString().equalsIgnoreCase(getResources().getString(R.string.menu_unselectAll))) {
+                        item.setTitle(getResources().getString(R.string.menu_selectAll));
+                        isUnseleAllEnabled=false;
+                    }
+                }
+
+            }
+
+            // rename  options will be visible if only i file is selected
+
+            MenuItem item= context_menu.findItem(R.id.action_rename);
+            if (multiselect_list.size()==1)
+                item.setVisible(true);
+            else
+                item.setVisible(false);
+
+            // rename  options will be visible if only i file is selected
+
+        }
+        getActivity().invalidateOptionsMenu();
+    }
+
+
+
+
     public void multi_select(int position) {
         if (mActionMode != null) {
-            if (multiselect_list.contains(recent_ImgList.get(position)))
-                multiselect_list.remove(recent_ImgList.get(position));
+            if (multiselect_list.contains(folder_List.get(position)))
+                multiselect_list.remove(folder_List.get(position));
             else {
-                multiselect_list.add(recent_ImgList.get(position));
+                multiselect_list.add(folder_List.get(position));
                 // to  rename file contain old file;
 
                 if(multiselect_list.size()==1) {
-                    fileTorename = recent_ImgList.get(position);
-                    renamePosition=position;
+                    /*fileTorename = recent_ImgList.get(position);
+                    renamePosition=position;*/
                 }
                 // to  rename file contain old file;
             }
@@ -219,12 +293,14 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
 
         }
     }
+
+
     public void refreshAdapter()
     {
-        multiSelectAdapter.selected_recentList=multiselect_list;
-        multiSelectAdapter.recentList=recent_ImgList;
+        multiSelectAdapter.selected_folfderList=multiselect_list;
+        multiSelectAdapter.folfderList=folder_List;
         multiSelectAdapter.notifyDataSetChanged();
-       // selectMenuChnage();
+         selectMenuChnage();
         //finish action mode when user deselect files one by one ;
         if(multiselect_list.size()==0) {
             if (mActionMode != null) {
@@ -233,85 +309,57 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
         }
     }
 
+
+   public void  updateFolderList()
+   {
+       new getFolderAsyncTask<folder_Model>(mContext,this).execute();
+   }
+
     @Override
     public void onResume() {
         super.onResume();
-        new AsynctaskUtility<fileModel>(mContext,this,Constants.REQUST_RECENT_FILE).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if(mActionMode!=null)
+       {
+             mActionMode.finish();
+       }
+
+        new getFolderAsyncTask<folder_Model>(mContext,this).execute();
+
+
     }
 
     @Override
-    public void onrecentSelected(fileModel recentFile) {
-
-        Utility.dispToast(mContext, recentFile.getFileName());
-        if(recentFile.getIsImgs())
-        {
+    public void returnFolderList(ArrayList output) {
 
 
-        }
-        else {
-
-            String fpath=new File(recentFile.getFilePath().toString()).getAbsolutePath();
-            Utility.dispToast(mContext, fpath);
-            Intent intent=new Intent(mContext,PDFViewActivity.class);
-            intent.putExtra(Constants.IntentfilePath, fpath);
-            startActivity(intent);
-
-        }
-
-
-        }
-
-    @Override
-    public void processFinish(ArrayList output) {
-
-        recent_ImgList=output;
-
-        if(recent_ImgList.size()>0) {
-            multiSelectAdapter = new MultiSelectAdapter_Recent(mContext, recent_ImgList, multiselect_list, this);
+        folder_List=output;
+        if(folder_List.size()>0) {
+            multiSelectAdapter = new MultiSelectAdapter_Folder(mContext, folder_List, multiselect_list,this);
             recyclerView.setLayoutManager(new GridLayoutManager(mContext, 3));
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.getItemAnimator().setChangeDuration(0);
             recyclerView.setAdapter(multiSelectAdapter);
-            recyclerView.setVisibility(View.VISIBLE);
             nodataFound.setVisibility(View.GONE);
         }
-        else
-        {
-            recyclerView.setVisibility(View.GONE);
+        else {
             nodataFound.setVisibility(View.VISIBLE);
         }
-
-
-
 
     }
 
     @Override
+    public void onFolderSelected(folder_Model contact) {
+
+
+        //Utility.dispToast(mContext,contact.getFolderPath() );
+
+        Intent intent=new Intent(getActivity(), Activity_File_List.class);
+        intent.putExtra(Constants.folderPath, contact.getFolderPath());
+        startActivity(intent);
+    }
+
+    @Override
     public void onPositiveClick(int from) {
-
-
-        if(from==1)
-        {
-            if(multiselect_list.size()>0)
-            {
-
-                ArrayList<File> filesTobeDleted=new ArrayList<>();
-                 for(int i=0;i<multiselect_list.size();i++)
-                 {
-                     filesTobeDleted.add(new File(multiselect_list.get(i).getFilePath()));
-                 }
-                 new deleteFileAsyncTask(mContext,this,filesTobeDleted).execute();
-
-                if(mActionMode!=null)
-                {
-                    mActionMode.finish();
-                }
-
-            }
-
-        }
-
-
 
     }
 
@@ -323,12 +371,5 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
     @Override
     public void onNeutralClick(int from) {
 
-    }
-
-    @Override
-    public void ondeleteSucceed(ArrayList<String> deletedFiles) {
-             //relaod the data if flie is  deleted
-        // for the time beo=ing the varibale deletedFiles is not being used but it contains the path of the files deleted
-        new AsynctaskUtility<fileModel>(mContext,this,Constants.REQUST_RECENT_FILE).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 }

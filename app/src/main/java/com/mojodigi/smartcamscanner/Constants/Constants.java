@@ -9,11 +9,12 @@ public class Constants {
     public static final int TYPE_PDF=1;
     public static final int TYPE_JPG=2;
 
-    public static  final String privacyUrl="http://mojodigitech.com/privacy-policy-for-file-hunt/";
+    public static  final String privacyUrl="http://mojodigitech.com/privacy-policy-for-smart-scanner/";
 
     public static final String parentfolder=Environment.getExternalStorageDirectory()+"/SmartScanner/";
-    public static final  String pdfFolderName= parentfolder+"pdfs";
-    public static final  String imageFolderName= parentfolder+"Imgs";
+    public static final  String pdfFolderName= parentfolder+"Pdfs";
+    public static final  String imageFolderName= parentfolder+"Images";
+    public static final  String allFilesFolder= parentfolder+"All files";
 
     public static final String IntentfilePath="path";
 
@@ -31,6 +32,16 @@ public class Constants {
     public static final String STORAGE_LOCATION = "storage_location";
     public static final String DEFAULT_PAGE_SIZE_TEXT = "DefaultPageSize";
     public static final String DEFAULT_PAGE_SIZE = "A4";
+
+
+    public static String folderPath="folderpath";
+
+
+    public static final int REQUST_ALL_FILE=1;
+    public static final int REQUST_RECENT_FILE=2;
+    public static final int REQUST_PDF_FILE=3;
+    public static final int REQUST_IMAGES_FILE=4;
+
 
 
 }

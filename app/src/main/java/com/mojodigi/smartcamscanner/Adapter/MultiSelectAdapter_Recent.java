@@ -63,7 +63,7 @@ public class MultiSelectAdapter_Recent extends RecyclerView.Adapter<MultiSelectA
         this.recentList = recentList;
         this.recentListfiltered=recentList;
         this.selected_recentList = selectedrecentList;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  this.listener = listener;
+        this.listener = listener;
 
 
 

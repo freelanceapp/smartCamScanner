@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.mojodigi.smartcamscanner.Fragments.AllFileFolderFragment;
+import com.mojodigi.smartcamscanner.Fragments.FolderFragment;
 import com.mojodigi.smartcamscanner.Fragments.RecentFragment;
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
@@ -23,7 +23,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
                 RecentFragment tab1 = new RecentFragment();
                 return tab1;
             case 1:
-                AllFileFolderFragment tab2 = new AllFileFolderFragment();
+                FolderFragment tab2 = new FolderFragment();
                 return tab2;
                 default:
                 return null;

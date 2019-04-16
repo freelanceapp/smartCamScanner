@@ -7,6 +7,15 @@ public class pdfModel
     String fileName;
     String fileSize;
     String fileModifiedDate;
+    long dateToSort;
+    public long getDateToSort() {
+        return dateToSort;
+    }
+
+    public void setDateToSort(long dateToSort) {
+        this.dateToSort = dateToSort;
+    }
+
 
     public String getFilePath() {
         return filePath;

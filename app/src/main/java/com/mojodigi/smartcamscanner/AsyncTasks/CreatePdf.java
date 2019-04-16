@@ -92,7 +92,7 @@ public class CreatePdf extends AsyncTask<String, String, String> {
         super.onPreExecute();
         mSuccess = true;
         CustomProgressDialog.show(mContext, mContext.getResources().getString(R.string.creating_pdf));
-        mOnPDFCreatedInterface.onPDFCreationStarted();
+        //mOnPDFCreatedInterface.onPDFCreationStarted();
     }
 
     private void setFilePath() {

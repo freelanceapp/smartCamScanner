@@ -5,45 +5,32 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_image_black_24dp"
             android:title="Import"/>
 
         <item
-            android:id="@+id/nav_files"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="All files" />
+            android:id="@+id/nav_share"
+            android:icon="@drawable/ic_menu_share"
+            android:title="Share" />
         <item
-            android:id="@+id/nav_pdf"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Pdfs" />
+            android:visible="false"
+            android:id="@+id/nav_send"
+            android:icon="@drawable/ic_menu_send"
+            android:title="Send" />
+
         <item
-            android:id="@+id/nav_imgs"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Images" />
+            android:id="@+id/nav_privacy"
+            android:icon="@drawable/ic_privacy_policy"
+            android:title="Privacy policy" />
+        <item
+            android:visible="false"
+            android:id="@+id/nav_scan"
+            android:icon="@drawable/ic_menu_send"
+            android:title="Scan qr code" />
 
     </group>
 
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
 
-            <item
-                android:id="@+id/nav_privacy"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Privacy policy" />
-            <item
-                android:id="@+id/nav_scan"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Scan qr code" />
-        </menu>
-    </item>
 
 </menu>

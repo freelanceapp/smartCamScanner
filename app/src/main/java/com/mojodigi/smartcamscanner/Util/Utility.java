@@ -1,15 +1,20 @@
 package com.mojodigi.smartcamscanner.Util;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.os.Environment;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
-import android.text.format.DateFormat;
+import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -26,6 +31,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Calendar.getInstance;
 
@@ -34,6 +40,50 @@ public class Utility {
 
 
 
+    static boolean fileStatus = false;
+    public static void setActivityTitle(Context ctx, String title) {
+
+        // this function works fine but not being used  now because another function
+        //setActivityTitle2 provides custom layout in action bar  which enable  high level  of customization in user Interface
+
+
+        //((AppCompatActivity)ctx).getSupportActionBar().setTitle(title);
+        // ((AppCompatActivity)ctx).getSupportActionBar().setTitle(Html.fromHtml("<font color='#000000'>"+title+"</font>"));
+       // Typeface tf = typeFace_adobe_caslonpro_Regular(ctx);
+        SpannableString s = new SpannableString(title);
+
+
+        //s.setSpan(new RelativeSizeSpan(2f), 0,s.length(), 0); // set size
+        s.setSpan(new ForegroundColorSpan(ctx.getResources().getColor(R.color.white)), 0, s.length(), 0);// set color
+       //s.setSpan(new CustomTypefaceSpan("", tf), 0, s.length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+
+        // Update the action bar title with the TypefaceSpan instance
+        android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) ctx).getSupportActionBar();
+
+        actionBar.setTitle(s);
+
+
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        try {
+            final Drawable upArrow = ctx.getResources().getDrawable(R.drawable.abc_ic_ab_back_material);
+
+            //upArrow.setColorFilterctx(ctx.getResources().getColor(R.color.grey), PorterDuff.Mode.SRC_ATOP);
+            upArrow.setColorFilter(ctx.getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+            actionBar.setHomeAsUpIndicator(upArrow);
+
+
+        } catch (Exception e) {
+
+        }
+
+
+
+    }
+    public static Date longToDate(Long l) {
+        Date d = new Date(l);
+        return d;
+    }
 
     public static void dispToast(Context ctx, String msg) {
         Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show();
@@ -75,13 +125,27 @@ public class Utility {
         }
     }
 
+    //check if a string contains only white spaces;
+    public static boolean isWhitespace(String str) {
+        if (str == null) {
+            return false;
+        }
+        int sz = str.length();
+        for (int i = 0; i < sz; i++) {
+            if ((Character.isWhitespace(str.charAt(i)) == false)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static Typeface typeFace_Gotham_Bold(Context ctx) {
 
         return Typeface.createFromAsset(ctx.getAssets(), "gothambold.otf");
     }
     public static Typeface typeFace_calibri(Context ctx) {
 
-        return Typeface.createFromAsset(ctx.getAssets(), "gothambold.otf");
+        return Typeface.createFromAsset(ctx.getAssets(), "calibri.ttf");
     }
 
     public static void setCustomizeSeachBar(Context mcontext, android.support.v7.widget.SearchView searchView) {
@@ -180,5 +244,43 @@ public class Utility {
         String formattedDate = sdf.format(Date);
         return formattedDate;
     }
+
+
+
+    public static boolean IsNotEmpty(EditText view) {
+        if (view.getText().length() > 0)
+            return true;
+        else
+            return false;
+
+    }
+    public static String getFileExtensionfromPath(String path) {
+        try {
+            File file = new File(path);
+            String extension = android.webkit.MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(file).toString());
+            return extension;
+        } catch (Exception e) {
+            return " ";
+        }
+    }
+
+    public static void RunMediaScan(Context context, File fileName) {
+        MediaScannerConnection.scanFile(
+                context, new String[]{fileName.getPath()}, null,
+                new MediaScannerConnection.MediaScannerConnectionClient() {
+                    @Override
+                    public void onMediaScannerConnected() {
+                        System.out.println("acn connected");
+                    }
+
+                    @Override
+                    public void onScanCompleted(String path, Uri uri) {
+
+                        System.out.println("scan completed");
+                    }
+                });
+    }
+
+
 
 }
