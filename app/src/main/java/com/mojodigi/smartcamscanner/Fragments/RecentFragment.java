@@ -400,11 +400,11 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
     @Override
     public void onrecentSelected(fileModel recentFile) {
 
-        Utility.dispToast(mContext, recentFile.getFileName());
+       // Utility.dispToast(mContext, recentFile.getFileName());
         if(recentFile.getIsImgs())
         {
 
-
+            Utility.OpenFileWithNoughtAndAll(recentFile.getFilePath(),mContext,getResources().getString(R.string.file_provider_authority));
         }
         else {
 

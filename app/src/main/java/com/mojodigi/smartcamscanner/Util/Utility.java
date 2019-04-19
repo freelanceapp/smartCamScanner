@@ -2,26 +2,37 @@ package com.mojodigi.smartcamscanner.Util;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
+import android.provider.BaseColumns;
+import android.provider.MediaStore;
 import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mojodigi.smartcamscanner.Activity_File_List;
+import com.mojodigi.smartcamscanner.Class.Icons;
 import com.mojodigi.smartcamscanner.Constants.Constants;
 import com.mojodigi.smartcamscanner.Model.fileModel;
 import com.mojodigi.smartcamscanner.R;
@@ -40,7 +51,12 @@ import static java.util.Calendar.getInstance;
 
 public class Utility {
 
+    private static final String INTERNAL_VOLUME = "internal";
+    public static final String EXTERNAL_VOLUME = "external";
 
+    private static final String EMULATED_STORAGE_SOURCE = System.getenv("EMULATED_STORAGE_SOURCE");
+    private static final String EMULATED_STORAGE_TARGET = System.getenv("EMULATED_STORAGE_TARGET");
+    private static final String EXTERNAL_STORAGE = System.getenv("EXTERNAL_STORAGE");
 
 
     static boolean fileStatus = false;
@@ -364,6 +380,151 @@ public class Utility {
 
         return  Utility.humanReadableByteCount(totalSize,true);
     }
+
+
+    public static void OpenFileWithNoughtAndAll(String name,Context ctx,String authority)
+    {
+        try {
+            Uri uri = null;
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            File file = new File(name.toLowerCase());
+            String extension = MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(file).toString());
+            String mimetype = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                //uri = Uri.fromFile(file);
+
+                uri=fileToContentUri(ctx,file);
+                if(uri==null)uri=Uri.fromFile(file);
+
+                if (uri != null) {
+                    if (extension.equalsIgnoreCase("") || mimetype == null) {
+                        // if there is no extension or there is no definite mimetype, still try to open the file
+                        intent.setDataAndType(uri, "text/*");
+                    } else {
+                        intent.setDataAndType(uri, mimetype);
+                    }
+                    // custom message for the intent
+                    //ctx.startActivity(Intent.createChooser(intent, "Choose an Application:"));  // does not show just one and always options
+                    ctx.startActivity(intent);
+
+                }
+            } else {
+
+                // in case of Android N and above Uri will be  made through provider written in Manifest file;
+                //uri = FileProvider.getUriForFile(ctx, authority, file);
+                uri=fileToContentUri(ctx,file);
+                if(uri==null)
+                    uri = FileProvider.getUriForFile(ctx, authority, file);
+                if (uri != null) {
+                    if (extension.equalsIgnoreCase("") || mimetype == null) {
+                        // if there is no extension or there is no definite mimetype, still try to open the file
+                        intent.setDataAndType(uri, "text/*");
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                    } else {
+                        intent.setDataAndType(uri, mimetype);
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    }
+                    // custom message for the intent
+                    //ctx. startActivity(Intent.createChooser(intent, "Choose an Application:")); // does not show just one and always options
+                    ctx.startActivity(intent);
+                }
+                //
+
+            }
+        }catch (ActivityNotFoundException e)
+        {
+            Toast.makeText(ctx, "Application Not Found ", Toast.LENGTH_SHORT).show();
+        }
+        catch (Exception e)
+        {
+            String str=e.getMessage();
+            System.out.println(""+str);
+        }
+
+
+    }
+    public static Uri fileToContentUri(Context context, File file) {
+        // Normalize the path to ensure media search
+        final String normalizedPath = normalizeMediaPath(file.getAbsolutePath());
+
+        // Check in external and internal storages
+        Uri uri = fileToContentUri(context, normalizedPath, file.isDirectory(), EXTERNAL_VOLUME);
+        if (uri != null) {
+            return uri;
+        }
+        uri = fileToContentUri(context, normalizedPath, file.isDirectory(), INTERNAL_VOLUME);
+        if (uri != null) {
+            return uri;
+        }
+        return null;
+    }
+    private static Uri fileToContentUri(Context context, String path, boolean isDirectory, String volume) {
+        final String where = MediaStore.MediaColumns.DATA + " = ?";
+        Uri baseUri;
+        String[] projection;
+        int mimeType = Icons.getTypeOfFile(path, isDirectory);
+
+        switch (mimeType) {
+            case Icons.IMAGE:
+                baseUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                projection = new String[]{BaseColumns._ID};
+                break;
+            case Icons.VIDEO:
+                baseUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                projection = new String[]{BaseColumns._ID};
+                break;
+            case Icons.AUDIO:
+                baseUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                projection = new String[]{BaseColumns._ID};
+                break;
+            default:
+                baseUri = MediaStore.Files.getContentUri(volume);
+                projection = new String[]{BaseColumns._ID, MediaStore.Files.FileColumns.MEDIA_TYPE};
+        }
+
+        ContentResolver cr = context.getContentResolver();
+        Cursor c = cr.query(baseUri, projection, where, new String[]{path}, null);
+        try {
+            if (c != null && c.moveToNext()) {
+                boolean isValid = false;
+                if (mimeType == Icons.IMAGE || mimeType == Icons.VIDEO || mimeType == Icons.AUDIO  || mimeType== Icons.PDF || mimeType==Icons.APK || mimeType==Icons.DOCUMENTS
+                        || mimeType==Icons.GIF || mimeType==Icons.PRESENTATION|| mimeType==Icons.SPREADSHEETS || mimeType==Icons.TEXT) {
+                    isValid = true;
+                } else {
+                    int type = c.getInt(c.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE));
+                    isValid = type != 0;
+                }
+
+                if (isValid) {
+                    // Do not force to use content uri for no media files
+                    long id = c.getLong(c.getColumnIndexOrThrow(BaseColumns._ID));
+                    return Uri.withAppendedPath(baseUri, String.valueOf(id));
+                }
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        return null;
+    }
+    public static String normalizeMediaPath(String path) {
+        // Retrieve all the paths and check that we have this environment vars
+        if (TextUtils.isEmpty(EMULATED_STORAGE_SOURCE) ||
+                TextUtils.isEmpty(EMULATED_STORAGE_TARGET) ||
+                TextUtils.isEmpty(EXTERNAL_STORAGE)) {
+            return path;
+        }
+
+        // We need to convert EMULATED_STORAGE_SOURCE -> EMULATED_STORAGE_TARGET
+        if (path.startsWith(EMULATED_STORAGE_SOURCE)) {
+            path = path.replace(EMULATED_STORAGE_SOURCE, EMULATED_STORAGE_TARGET);
+        }
+        return path;
+    }
+
 
 
 
