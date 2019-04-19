@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.mojodigi.smartcamscanner.Activity_File_List;
 import com.mojodigi.smartcamscanner.Adapter.MultiSelectAdapter_Folder;
 import com.mojodigi.smartcamscanner.Adapter.MultiSelectAdapter_Recent;
+import com.mojodigi.smartcamscanner.AsyncTasks.deleteFileAsyncTask;
 import com.mojodigi.smartcamscanner.AsyncTasks.getFolderAsyncTask;
 import com.mojodigi.smartcamscanner.Constants.Constants;
 import com.mojodigi.smartcamscanner.Model.fileModel;
@@ -29,10 +30,12 @@ import com.mojodigi.smartcamscanner.R;
 import com.mojodigi.smartcamscanner.Util.AlertDialogHelper;
 import com.mojodigi.smartcamscanner.Util.RecyclerItemClickListener;
 import com.mojodigi.smartcamscanner.Util.Utility;
+import com.mojodigi.smartcamscanner.Util.renameUtility;
 
+import java.io.File;
 import java.util.ArrayList;
 
-public class FolderFragment extends Fragment implements getFolderAsyncTask.foldetlistListener ,MultiSelectAdapter_Folder.folderListener,AlertDialogHelper.AlertDialogListener  {
+public class FolderFragment extends Fragment implements getFolderAsyncTask.foldetlistListener ,MultiSelectAdapter_Folder.folderListener,AlertDialogHelper.AlertDialogListener ,deleteFileAsyncTask.deleteListener {
 
 
     RecyclerView recyclerView;
@@ -68,7 +71,7 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
         recyclerView =view.findViewById(R.id.recycler_view);
         nodataFound=view.findViewById(R.id.nodataFound);
 
-
+        alertDialogHelper =new AlertDialogHelper(getActivity(),this);
 
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(mContext, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
@@ -108,7 +111,7 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             // Inflate a menu resource providing context menu items
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.menu_multi_select, menu);
+            inflater.inflate(R.menu.menu_multi_select_folder, menu);
             context_menu = menu;
             return true;
         }
@@ -131,14 +134,19 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
 
 
                 case R.id.action_rename:
-                    if(multiselect_list.size()==1)
-                        //  Utility.fileRenameDialog(mcontext,multiselect_list.get(0).getFilePath(),Constants.DOCUMENT,false);
+                   /* if(multiselect_list.size()==1)
+                          renameUtility.fileRenameDialog(mContext,multiselect_list.get(0).getFolderPath());*/
                         return  true;
                 case R.id.action_delete:
                     if(multiselect_list.size()>=1) {
                         int mFileCount = multiselect_list.size();
-                        String msgDeleteFile = mFileCount > 1 ? mFileCount + " " + getResources().getString(R.string.delfiles) : mFileCount + " " + getResources().getString(R.string.delfile);
-                        alertDialogHelper.showAlertDialog("", "Delete Image"+" ("+msgDeleteFile+")", "DELETE", "CANCEL", 1, true);
+                        String msgDeleteFile = mFileCount > 1 ? mFileCount + " " + getResources().getString(R.string.delfolders) : mFileCount + " " + getResources().getString(R.string.delfolder);
+                        if(multiselect_list.get(0).getFolderPath().contains(Constants.allFilesFolder) || multiselect_list.get(0).getFolderPath().contains(Constants.pdfDirectory) ||  multiselect_list.get(0).getFolderPath().contains(Constants.imageFolderName))
+                        {
+                            Utility.dispToast(mContext, "App folder can't be deleted");
+                            return true ;
+                        }
+                        alertDialogHelper.showAlertDialog("", "Delete folder"+" ("+msgDeleteFile+")", "DELETE", "CANCEL", 1, true);
                     }
                     return true;
                 case R.id.action_select:
@@ -252,15 +260,15 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
 
             }
 
-            // rename  options will be visible if only i file is selected
+            // rename  options will be visible if only 1 file is selected
 
-            MenuItem item= context_menu.findItem(R.id.action_rename);
+          /*  MenuItem item= context_menu.findItem(R.id.action_rename);
             if (multiselect_list.size()==1)
                 item.setVisible(true);
             else
                 item.setVisible(false);
 
-            // rename  options will be visible if only i file is selected
+            // rename  options will be visible if only 1 file is selected*/
 
         }
         getActivity().invalidateOptionsMenu();
@@ -294,6 +302,26 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
         }
     }
 
+
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if(!isVisibleToUser)
+        {
+            if(mActionMode!=null)
+                mActionMode.finish();
+        }
+        if(isVisibleToUser)
+        {
+            if(Constants.callUpdateMethod) {
+                Constants.callUpdateMethod=false;
+                updateFolderList();
+            }
+        }
+
+    }
 
     public void refreshAdapter()
     {
@@ -333,6 +361,7 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
 
 
         folder_List=output;
+
         if(folder_List.size()>0) {
             multiSelectAdapter = new MultiSelectAdapter_Folder(mContext, folder_List, multiselect_list,this);
             recyclerView.setLayoutManager(new GridLayoutManager(mContext, 3));
@@ -340,8 +369,11 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
             recyclerView.getItemAnimator().setChangeDuration(0);
             recyclerView.setAdapter(multiSelectAdapter);
             nodataFound.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
         }
         else {
+
+            recyclerView.setVisibility(View.GONE);
             nodataFound.setVisibility(View.VISIBLE);
         }
 
@@ -361,6 +393,28 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
     @Override
     public void onPositiveClick(int from) {
 
+        if(from==1)
+        {
+            if(multiselect_list.size()>0)
+            {
+
+
+                ArrayList<File> filesTobeDleted=new ArrayList<>();
+                for(int i=0;i<multiselect_list.size();i++)
+                {
+                    filesTobeDleted.add(new File(multiselect_list.get(i).getFolderPath()));
+                }
+                new deleteFileAsyncTask(mContext,this,filesTobeDleted).execute();
+
+                if(mActionMode!=null)
+                {
+                    mActionMode.finish();
+                }
+
+            }
+
+        }
+
     }
 
     @Override
@@ -371,5 +425,11 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
     @Override
     public void onNeutralClick(int from) {
 
+    }
+
+    @Override
+    public void ondeleteSucceed(ArrayList<String> deletedFiles) {
+
+        new getFolderAsyncTask<folder_Model>(mContext,this).execute();
     }
 }

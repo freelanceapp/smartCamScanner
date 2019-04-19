@@ -12,6 +12,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -345,6 +346,7 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
 
         if(success) {
             Utility.dispToast(mContext, getResources().getString(R.string.file_success));
+
             finish();
         }
         else
@@ -494,4 +496,13 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
         });
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+
+    }
+
+
 }

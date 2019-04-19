@@ -22,22 +22,10 @@ public class AddConstants
     public static final String API_RESPONSE_CODE="apiResponseCode";
 
     public static final String APP_NAME_POSTFIX= "_JMM";  // will  identify the client like  lava ,carbon etc ;
-    public static final String VENDOR_ID="JMMFH002";
+    public static final String VENDOR_ID="JMMSS001";   // where SS Stands for Smart Scanner
 
- /*   public static final String APP_NAME_POSTFIX= "_KARBONN";  // will  identify the client like  lava ,carbon etc ;
-    public static final String VENDOR_ID="KARBONNFH002";*/
 
-//        public static final String APP_NAME_POSTFIX= "_GIONEE";  // will  identify the client like  lava ,carbon etc ;
-//        public static final String VENDOR_ID="GIONEEFH002";
 
-//    public static final String APP_NAME_POSTFIX= "_LAVA";  // will  identify the client like  lava ,carbon etc ;
-//    public static final String VENDOR_ID="LAVAFH002";
-
-//    public static final String APP_NAME_POSTFIX= "_SAMSUNG";  // will  identify the client like  lava ,carbon etc ;
-//    public static final String VENDOR_ID="SAMSUNGFH002";
-
-    // public static final String APP_NAME_POSTFIX= "_KAB";
-    //public static final String VENDOR_ID="KABFH001";
 
 
 
@@ -69,31 +57,13 @@ public class AddConstants
 
 
 
-    public static final String KEY_SHOW_HIDDEN_FILE="showFiles";
-    public static final String KEY_DISPLAY_SMALL_FILE="smallfile";
-    public static final String KEY_HIDE_EXTERNAL_STORAGE="hideExtStrg";
-    public static final String KEY_TEXT_SIZE="txtSizeIndex";
-    public static final String KEY_TEXT_SIZE_INDEX="txtSize";
 
 
-    //sharedPrefKeys
-
-    public static final  int SMALL_FILE_SIZE=30;   // in kb;
-
-    //InMobiVars
-    public static final int BANNER_WIDTH_INMOBI = 320;
-    public static final int BANNER_HEIGHT_INMOBI = 50;
-
-    //for banner
-      public static long YOUR_PLACEMENT_ID = 1473189489298L;  //sdk test
-    // long YOUR_PLACEMENT_ID = 1542777410386L;  // mine created
 
 
-    // placementId for Interstitial full screen
-     public static long YOUR_PLACEMENT_ID_INTERESTIAL = 1475973082314L; //sdk  //testId
 
 
-    //InMobiVars
+
 
 
     //JsonRequestkeys

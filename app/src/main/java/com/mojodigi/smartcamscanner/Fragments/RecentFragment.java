@@ -3,11 +3,14 @@ package com.mojodigi.smartcamscanner.Fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mojodigi.smartcamscanner.Adapter.MultiSelectAdapter_Recent;
 import com.mojodigi.smartcamscanner.AsyncTasks.AsynctaskUtility;
@@ -32,12 +36,13 @@ import com.mojodigi.smartcamscanner.R;
 import com.mojodigi.smartcamscanner.Util.AlertDialogHelper;
 import com.mojodigi.smartcamscanner.Util.RecyclerItemClickListener;
 import com.mojodigi.smartcamscanner.Util.Utility;
+import com.mojodigi.smartcamscanner.Util.renameUtility;
 
 import java.io.File;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
 
-public class RecentFragment extends Fragment  implements MultiSelectAdapter_Recent.recentListener ,AsynctaskUtility.AsyncResponse, AlertDialogHelper.AlertDialogListener ,deleteFileAsyncTask.deleteListener {
+public class RecentFragment extends Fragment  implements MultiSelectAdapter_Recent.recentListener ,AsynctaskUtility.AsyncResponse, AlertDialogHelper.AlertDialogListener ,deleteFileAsyncTask.deleteListener,renameUtility.reNameListener {
 
 
 
@@ -56,6 +61,8 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
     AlertDialogHelper alertDialogHelper;
     //TextView nodataFound;
     ImageView nodataFound;
+
+    static RecentFragment instance;
 
   Context mContext;
     @Override
@@ -77,6 +84,13 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+
+        if(!isVisibleToUser)
+        {
+            if(mActionMode!=null)
+                mActionMode.finish();
+        }
+
         }
 
 
@@ -88,7 +102,7 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
         recyclerView =view.findViewById(R.id.recycler_view);
         nodataFound=view.findViewById(R.id.nodataFound);
 
-
+          instance=this;
 
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(mContext, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
@@ -151,8 +165,10 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
 
 
                 case R.id.action_rename:
-                    if(multiselect_list.size()==1)
-                      //  Utility.fileRenameDialog(mcontext,multiselect_list.get(0).getFilePath(),Constants.DOCUMENT,false);
+                    if(multiselect_list.size()==1) {
+                        renameUtility obj=new renameUtility();
+                        obj.fileRenameDialog(mContext, multiselect_list.get(0).getFilePath(), instance);
+                    }
                     return  true;
                 case R.id.action_delete:
                     if(multiselect_list.size()>=1) {
@@ -162,23 +178,24 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
                     }
                     return true;
                 case R.id.action_select:
-                   /* if(recent_ImgList.size()==multiselect_list.size() || isUnseleAllEnabled==true)
+                  if(recent_ImgList.size()==multiselect_list.size() || isUnseleAllEnabled==true)
                         unSelectAll();
                     else
-                        selectAll();*/
+                        selectAll();
+
                     return  true;
                 case  R.id.action_Share:
-                    //shareMultipleDocsWithNoughatAndAll();
+                    shareMultipleFilesWithNoughatAndAll();
                     return  true;
                 case R.id.action_details:
                     if(multiselect_list.size()==1) {
-                        //DispDetailsDialog(multiselect_list.get(0));
+                        Utility.DispDetailsDialog(mContext,multiselect_list.get(0));
                     }
                     else {
-                        /*String size =calcSelectFileSize(multiselect_list);
+                        String size =Utility.calcSelectFileSize(multiselect_list);
                         System.out.println("" + size);
                         if(size!=null)
-                            Utility.multiFileDetailsDlg(mcontext,size,multiselect_list.size());*/
+                            Utility.multiFileDetailsDlg(mContext,size,multiselect_list.size());
                     }
                     return true;
                 default:
@@ -219,12 +236,147 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
 
         }
     }
+    private void selectMenuChnage()
+    {
+        if(context_menu!=null)
+        {
+            if(recent_ImgList.size()==multiselect_list.size()) {
+                for (int i = 0; i < context_menu.size(); i++) {
+                    MenuItem item = context_menu.getItem(i);
+                    if (item.getTitle().toString().equalsIgnoreCase(getResources().getString(R.string.menu_selectAll))) {
+                        item.setTitle(getResources().getString(R.string.menu_unselectAll));
+                        isUnseleAllEnabled=true;
+                    }
+                }
+            }
+            else {
+
+                for (int i = 0; i < context_menu.size(); i++) {
+                    MenuItem item = context_menu.getItem(i);
+                    if (item.getTitle().toString().equalsIgnoreCase(getResources().getString(R.string.menu_unselectAll))) {
+                        item.setTitle(getResources().getString(R.string.menu_selectAll));
+                        isUnseleAllEnabled=false;
+                    }
+                }
+
+            }
+
+            // rename  options will be visible if only 1 file is selected
+
+            MenuItem item= context_menu.findItem(R.id.action_rename);
+            if (multiselect_list.size()==1)
+                item.setVisible(true);
+            else
+                item.setVisible(false);
+
+            // rename  options will be visible if only i file is selected
+
+        }
+        getActivity().invalidateOptionsMenu();
+    }
+
+    private void unSelectAll()
+    {
+        if (mActionMode != null)
+        {
+            multiselect_list.clear();
+
+            if (multiselect_list.size() >= 0)
+                mActionMode.setTitle("" + multiselect_list.size());
+            else
+                mActionMode.setTitle("");
+
+            //to change  the unselectAll  menu  to  selectAll
+            selectMenuChnage();
+            //to change  the unselectAll  menu  to  selectAll
+
+            if (mActionMode != null) {
+                mActionMode.finish();
+            }
+
+
+
+            refreshAdapter();
+
+        }
+    }
+
+    private void selectAll()
+    {
+        if (mActionMode != null)
+        {
+            multiselect_list.clear();
+
+            for(int i=0;i<recent_ImgList.size();i++)
+            {
+                if(!multiselect_list.contains(multiselect_list.contains(recent_ImgList.get(i))))
+                {
+                    multiselect_list.add(recent_ImgList.get(i));
+                }
+            }
+            if (multiselect_list.size() > 0)
+                mActionMode.setTitle("" + multiselect_list.size());
+            else
+                mActionMode.setTitle("");
+
+            refreshAdapter();
+            //to change  the unselectAll  menu  to  selectAll
+            selectMenuChnage();
+            //to change  the unselectAll  menu  to  selectAll
+
+        }
+    }
+
+    private void shareMultipleFilesWithNoughatAndAll() {
+
+        if(multiselect_list.size()>0)
+        {
+            Intent sharingIntent = new Intent();
+            sharingIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
+            sharingIntent.setType("*/*");
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
+            {
+                ArrayList<Uri> files = new ArrayList<Uri>();
+
+                for (int i = 0; i < multiselect_list.size(); i++) {
+                    File file = new File(multiselect_list.get(i).getFilePath());
+                    Uri uri = Uri.fromFile(file);
+                    files.add(uri);
+                }
+                sharingIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
+                startActivity(sharingIntent);
+            }
+            else
+            {
+                ArrayList<Uri> files = new ArrayList<Uri>();
+
+                for (int i = 0; i < multiselect_list.size(); i++)
+                {
+                    File file = new File(multiselect_list.get(i).getFilePath());
+                    Uri uri = FileProvider.getUriForFile(mContext, getResources().getString(R.string.file_provider_authority), file);
+                    files.add(uri);
+                }
+                sharingIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
+                sharingIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(sharingIntent);
+
+            }
+
+        }
+        else
+        {
+            Toast.makeText(mContext, "No files to share", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
     public void refreshAdapter()
     {
         multiSelectAdapter.selected_recentList=multiselect_list;
         multiSelectAdapter.recentList=recent_ImgList;
         multiSelectAdapter.notifyDataSetChanged();
-       // selectMenuChnage();
+        selectMenuChnage();
         //finish action mode when user deselect files one by one ;
         if(multiselect_list.size()==0) {
             if (mActionMode != null) {
@@ -236,7 +388,13 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
     @Override
     public void onResume() {
         super.onResume();
+        finishActionMode();
         new AsynctaskUtility<fileModel>(mContext,this,Constants.REQUST_RECENT_FILE).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+    private void finishActionMode()
+    {
+        if(mActionMode!=null)
+            mActionMode.finish();
     }
 
     @Override
@@ -330,5 +488,28 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
              //relaod the data if flie is  deleted
         // for the time beo=ing the varibale deletedFiles is not being used but it contains the path of the files deleted
         new AsynctaskUtility<fileModel>(mContext,this,Constants.REQUST_RECENT_FILE).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    @Override
+    public void onRenameSuccess() {
+
+        Utility.dispToast(mContext, "rename success");
+        if(mActionMode!=null)
+        {
+            mActionMode.finish();
+        }
+        new AsynctaskUtility<fileModel>(mContext,this,Constants.REQUST_RECENT_FILE).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+    }
+
+    @Override
+    public void onRenameFailure() {
+        if(mActionMode!=null)
+        {
+            mActionMode.finish();
+        }
+
+        Utility.dispToast(mContext, "Error while renaming file ");
+
     }
 }

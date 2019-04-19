@@ -43,9 +43,38 @@ public class deleteFileAsyncTask extends AsyncTask<Void,Void,Integer> {
                 deletedFiles.add(deleFilePath);
                 counter++;
             }
+            else if(filesTobeDeleted.get(i).isDirectory())
+            {
+                   boolean st=deleteNon_EmptyDir(filesTobeDeleted.get(i));
+                   if(st)
+                       counter++;
+            }
+
 
         }
         return counter;
+    }
+    public  boolean deleteNon_EmptyDir(File dir) {
+        if (dir.isDirectory())
+        {
+            String[] children = dir.list();
+            for (int i=0; i<children.length; i++) {
+                boolean success = deleteNon_EmptyDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+
+
+
+        boolean status= dir.delete();
+        if(status)
+            Utility.RunMediaScan(mContext,dir);
+
+        return status;
+
+
     }
 
     @Override

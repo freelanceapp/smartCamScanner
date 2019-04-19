@@ -21,12 +21,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mojodigi.smartcamscanner.Activity_File_List;
 import com.mojodigi.smartcamscanner.Constants.Constants;
+import com.mojodigi.smartcamscanner.Model.fileModel;
 import com.mojodigi.smartcamscanner.R;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -280,6 +283,89 @@ public class Utility {
                     }
                 });
     }
+
+
+
+    public static void DispDetailsDialog( Context mContext, fileModel fileProperty )
+    {
+
+        if(fileProperty.getFilePath() !=null)
+        {
+
+            String[] splitPath = fileProperty.getFilePath().split("/");
+            String fName = splitPath[splitPath.length - 1];
+
+            Dialog dialog = new Dialog(mContext);
+            dialog.setContentView(R.layout.dialog_file_property);
+            // Set dialog title
+
+            TextView FileName = dialog.findViewById(R.id.FileName);
+            TextView FilePath = dialog.findViewById(R.id.FilePath);
+            TextView FileSize = dialog.findViewById(R.id.FileSize);
+            TextView FileDate = dialog.findViewById(R.id.FileDate);
+            TextView Resolution = dialog.findViewById(R.id.Resolution);
+            TextView resltxt=dialog.findViewById(R.id.resltxt);
+
+            TextView Oreintation = dialog.findViewById(R.id.ort);
+            TextView oreinttxt=dialog.findViewById(R.id.oreinttxt);
+
+            Oreintation.setVisibility(View.GONE);
+            oreinttxt.setVisibility(View.GONE);
+            resltxt.setVisibility(View.GONE);
+            Resolution.setVisibility(View.GONE);
+
+
+
+
+            FileName.setText(fName);
+            FilePath.setText(fileProperty.getFilePath());
+            FileSize.setText(fileProperty.getFileSize());
+            FileDate.setText(fileProperty.getFileModifiedDate());
+
+
+
+            dialog.show();
+        }
+    }
+    public static void multiFileDetailsDlg(Context ctx, String totalSize, int fileCount) {
+
+        final Dialog dialog = new Dialog(ctx);
+        dialog.setContentView(R.layout.multifiledetais_dialog);
+        // Set dialog title
+
+        TextView FileNum = dialog.findViewById(R.id.FileNum);
+        TextView FileSize = dialog.findViewById(R.id.FileSizem);
+        TextView close = dialog.findViewById(R.id.close);
+        FileNum.setText(String.valueOf(fileCount));
+        FileSize.setText(totalSize);
+
+
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+
+        dialog.show();
+    }
+
+    public static  String calcSelectFileSize(ArrayList<fileModel> fileList)
+    {
+        long totalSize=0;
+
+        for(int i=0;i<fileList.size();i++)
+        {
+            fileModel m =  fileList.get(i);
+            File f= new File(m.getFilePath());
+            totalSize+=f.length();
+        }
+
+        return  Utility.humanReadableByteCount(totalSize,true);
+    }
+
+
 
 
 

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Smart Cam Scanner</string>
+    <string name="app_name">Smart Scanner</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Smart Scanner</string>
@@ -19,7 +19,10 @@
 
     <string name="file_provider_authority">com.mojodigi.smartcamscanner</string>
     <string name="delfiles">files</string>
+    <string name="delfolders">folders</string>
     <string name="delfile">file</string>
+    <string name="delfolder">folder</string>
+
     <string name="filter_file_name">%s_%s.jpg</string>
 
     <string name="action_sort">Sort</string>
@@ -94,5 +97,27 @@
         <item>B9 (124 x 175)</item>
         <item>B10 (87 x 124)</item>
     </string-array>
+
+
+
+
+
+    <!-- demo add ids -->
+    <!--
+<string name="admob_app_id">ca-app-pub-5603925957932903~3576315291</string>
+<string name="banner_add_id">ca-app-pub-3940256099942544/6300978111</string>
+<string name="ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
+<string name="ad_unit_id_reward">ca-app-pub-3940256099942544/5224354917</string>
+-->
+    <!-- demo add ids -->
+
+    <!--actual add id for FileHunt runningAccount -->
+
+    <string name="admob_app_id">ca-app-pub-7769757158085259~2218192747</string>
+    <string name="banner_add_id">ca-app-pub-7769757158085259/4065874309</string>
+    <string name="ad_unit_id">ca-app-pub-7769757158085259/5753526349</string>
+    <string name="ad_unit_id_reward">ca-app-pub-7769757158085259/5906156319</string>
+
+    <!--actual add id for FileHunt runningAccount -->
 
 </resources>

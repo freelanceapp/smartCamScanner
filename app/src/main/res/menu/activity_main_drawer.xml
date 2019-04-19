@@ -10,6 +10,12 @@
             android:title="Import"/>
 
         <item
+
+            android:id="@+id/nav_scan"
+            android:icon="@drawable/ic_qr_code"
+            android:title="Scan qr/bar code" />
+
+        <item
             android:id="@+id/nav_share"
             android:icon="@drawable/ic_menu_share"
             android:title="Share" />
@@ -23,11 +29,7 @@
             android:id="@+id/nav_privacy"
             android:icon="@drawable/ic_privacy_policy"
             android:title="Privacy policy" />
-        <item
-            android:visible="false"
-            android:id="@+id/nav_scan"
-            android:icon="@drawable/ic_menu_send"
-            android:title="Scan qr code" />
+
 
     </group>
 

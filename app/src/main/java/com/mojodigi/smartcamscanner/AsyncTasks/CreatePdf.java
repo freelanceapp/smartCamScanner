@@ -24,6 +24,7 @@ import com.mojodigi.smartcamscanner.Model.Watermark;
 import com.mojodigi.smartcamscanner.R;
 import com.mojodigi.smartcamscanner.Util.CustomProgressDialog;
 import com.mojodigi.smartcamscanner.Util.StringUtils;
+import com.mojodigi.smartcamscanner.Util.Utility;
 import com.mojodigi.smartcamscanner.Util.WatermarkPageEvent;
 
 import java.io.File;
@@ -185,7 +186,9 @@ public class CreatePdf extends AsyncTask<String, String, String> {
 
             Log.v("Stage 7", "Document Closed" + mPath);
 
-            Log.v("Stage 8", "Record inserted in database");
+
+
+            deleteJunkFiles();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -240,6 +243,32 @@ public class CreatePdf extends AsyncTask<String, String, String> {
                 Color.green(color),
                 Color.blue(color)
         );
+    }
+
+    private void deleteJunkFiles()
+    {
+        String path=Constants.pdfFolderName;
+        File  filePath =new File(path);
+        if(filePath.exists())
+        {
+            File[] f = filePath.listFiles();
+            for(int i=0;i<f.length;i++)
+            {
+                File file =f[i];
+
+                if(file.getName().toString().startsWith("cropped_"))
+                {
+                    String pathstr=file.getAbsolutePath();
+                    Log.d("deletedFile-->>", pathstr);
+                    if(file.delete())
+                    {
+                        Utility.RunMediaScan(mContext, file);
+                    }
+
+                }
+            }
+
+        }
     }
 }
 

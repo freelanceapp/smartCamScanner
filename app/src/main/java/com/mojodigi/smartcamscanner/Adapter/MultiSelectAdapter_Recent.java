@@ -41,6 +41,7 @@ public class MultiSelectAdapter_Recent extends RecyclerView.Adapter<MultiSelectA
             imageView=(ImageView)view.findViewById(R.id.imageView);
             ticksymbol=(RelativeLayout) view.findViewById(R.id.ticksymbol);
             fNameView=view.findViewById(R.id.fNameView);
+            fNameView.setTypeface(Utility.typeFace_calibri(mContext));
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override

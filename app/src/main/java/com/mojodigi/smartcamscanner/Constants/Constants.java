@@ -12,6 +12,7 @@ public class Constants {
     public static  final String privacyUrl="http://mojodigitech.com/privacy-policy-for-smart-scanner/";
 
     public static final String parentfolder=Environment.getExternalStorageDirectory()+"/SmartScanner/";
+
     public static final  String pdfFolderName= parentfolder+"Pdfs";
     public static final  String imageFolderName= parentfolder+"Images";
     public static final  String allFilesFolder= parentfolder+"All files";
@@ -43,5 +44,6 @@ public class Constants {
     public static final int REQUST_IMAGES_FILE=4;
 
 
-
+    public static String QrData="QrData";
+    public static boolean callUpdateMethod;
 }
