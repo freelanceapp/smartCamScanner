@@ -4,8 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.arch.lifecycle.ViewModelProvider;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -55,7 +53,6 @@ import com.mojodigi.smartcamscanner.AddsUtility.JsonParser;
 import com.mojodigi.smartcamscanner.AddsUtility.OkhttpMethods;
 import com.mojodigi.smartcamscanner.AddsUtility.SharedPreferenceUtil;
 import com.mojodigi.smartcamscanner.Constants.Constants;
-import com.mojodigi.smartcamscanner.Fragments.FolderFragment;
 import com.mojodigi.smartcamscanner.Model.ImageToPDFOptions;
 import com.mojodigi.smartcamscanner.Util.Utility;
 import com.scanlibrary.ScanActivity;
@@ -70,7 +67,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.KeyStore;
 import java.util.ArrayList;
 
 import static com.mojodigi.smartcamscanner.Constants.Constants.STORAGE_LOCATION;
@@ -112,6 +108,7 @@ public class MainActivity extends AppCompatActivity
     ViewPager viewPager;
 
 
+
     //add vars
 
     SharedPreferenceUtil addprefs;
@@ -133,6 +130,7 @@ public class MainActivity extends AppCompatActivity
         mContext=MainActivity.this;
         permissionStatus =mContext.getSharedPreferences("permissionStatus", MODE_PRIVATE);
         instance=this;
+
         setSupportActionBar(toolbar);
         askForPermission();
 
@@ -604,6 +602,9 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+
+
+
     private void createFolderDialog() {
 
         final Dialog dialog = new Dialog(mContext);
@@ -640,7 +641,7 @@ public class MainActivity extends AppCompatActivity
                         Constants.callUpdateMethod= true;
                         viewPager.setCurrentItem(1);
 
-                    }
+                        }
                     else
                     {
                         Utility.dispToast(mContext,getResources().getString(R.string.folder_failure) );

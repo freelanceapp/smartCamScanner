@@ -20,17 +20,14 @@ import android.widget.TextView;
 
 import com.mojodigi.smartcamscanner.Activity_File_List;
 import com.mojodigi.smartcamscanner.Adapter.MultiSelectAdapter_Folder;
-import com.mojodigi.smartcamscanner.Adapter.MultiSelectAdapter_Recent;
 import com.mojodigi.smartcamscanner.AsyncTasks.deleteFileAsyncTask;
 import com.mojodigi.smartcamscanner.AsyncTasks.getFolderAsyncTask;
 import com.mojodigi.smartcamscanner.Constants.Constants;
-import com.mojodigi.smartcamscanner.Model.fileModel;
 import com.mojodigi.smartcamscanner.Model.folder_Model;
 import com.mojodigi.smartcamscanner.R;
 import com.mojodigi.smartcamscanner.Util.AlertDialogHelper;
 import com.mojodigi.smartcamscanner.Util.RecyclerItemClickListener;
 import com.mojodigi.smartcamscanner.Util.Utility;
-import com.mojodigi.smartcamscanner.Util.renameUtility;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -432,4 +429,7 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
 
         new getFolderAsyncTask<folder_Model>(mContext,this).execute();
     }
+
+
+
 }
