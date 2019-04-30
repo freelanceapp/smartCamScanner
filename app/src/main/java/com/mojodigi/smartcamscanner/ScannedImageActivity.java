@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,15 +43,16 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
     Context mContext;
     Toolbar toolbar;
     ImageView scannedImage;
+
     int REQUEST_CODE_SCAN=100;
+
     public static ScannedImageActivity instance;
     private Bitmap imageBitmap;
     private Bitmap imageBitmapTosave;
     EditText fileNameEditText;
 
-
-
     private RecyclerView thumbListView;
+
     static {
         System.loadLibrary("NativeImageProcessor");
     }
@@ -58,42 +60,54 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-         setContentView(R.layout.scanned_image_activity2);
-         mContext=ScannedImageActivity.this;
-         instance=this;
+
+        setContentView(R.layout.scanned_image_activity2);
+
+        if(mContext==null) {
+            mContext = ScannedImageActivity.this;
+        }
+
+        instance = this;
 
 
-         Utility.setActivityTitle(mContext, "Scanned file");
-         if(Constants.imageBitmap!=null) {
-             imageBitmap = Constants.imageBitmap;
-         }
-         initComponents();
+        Utility.setActivityTitle(mContext, "Scanned file");
+        if(Constants.imageBitmap!=null) {
+            imageBitmap = Constants.imageBitmap;
+        }
+
+        initComponents();
 
 
-         }
+    }
 
-        private void initComponents() {
+    private void initComponents() {
 
-              thumbListView = (RecyclerView) findViewById(R.id.thumbnails);
-              scannedImage=findViewById(R.id.scannedImage);
-             fileNameEditText=findViewById(R.id.fileNameEditText);
-             fileNameEditText.setText(Utility.getFileName());
-            fileNameEditText.setSelection(fileNameEditText.getText().toString().length());
+        thumbListView = (RecyclerView) findViewById(R.id.thumbnails);
+        scannedImage=findViewById(R.id.scannedImage);
+        fileNameEditText=findViewById(R.id.fileNameEditText);
 
+        fileNameEditText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                view.setFocusable(true);
+                view.setFocusableInTouchMode(true);
+                return false;
+            }});
+
+        fileNameEditText.setText(Utility.getFileName());
+        fileNameEditText.setSelection(fileNameEditText.getText().toString().length());
 
         if(imageBitmap!=null)
             scannedImage.setImageBitmap(imageBitmap);
+        initHorizontalList();
+    }
 
 
-
-            initHorizontalList();
-        }
-
-
-        @Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.scanned_image_menu, menu);
+        //getMenuInflater().inflate(R.menu.scanned_image_menu, menu);
+        getMenuInflater().inflate(R.menu.scanned_file_menu, menu);
         return true;
     }
 
@@ -181,15 +195,14 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
                 }
 
                 break;
-                case R.id.action_settings:
-                Utility.dispToast(mContext, "settings");
-                break;
-
+//            case R.id.action_settings:
+//                Utility.dispToast(mContext, "settings");
+//                break;
         }
-
-
         return super.onOptionsItemSelected(item);
     }
+
+
 
 
     @Override
@@ -212,7 +225,7 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
             public void onClick(View view) {
 
                 Utility.dispToast(mContext, "share pdf ");
-              //  createPdf(Utility.getFileName());
+                //  createPdf(Utility.getFileName());
 
             }
         });
@@ -232,18 +245,17 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
             }
         });
 
-
-
-
         dialog.show();
-
     }
+
+
+
     private void saveDialog() {
         final Dialog dialog = new Dialog(mContext);
         dialog.setContentView(R.layout.dialog_save);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-       ImageView savePdf=dialog.findViewById(R.id.savepdf);
-       ImageView saveImage=dialog.findViewById(R.id.saveimage);
+        ImageView savePdf=dialog.findViewById(R.id.savepdf);
+        ImageView saveImage=dialog.findViewById(R.id.saveimage);
         Button cancelSave =dialog.findViewById(R.id.cancelSave);
 
         savePdf.setOnClickListener(new View.OnClickListener() {
@@ -259,11 +271,10 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
                     Utility.dispToast(mContext,"file name can't be blank");
                 }
                 dialog.dismiss();
-
-
             }
 
         });
+
         saveImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -278,15 +289,15 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
                     Utility.dispToast(mContext, "Error while creating file");
                 }
                 dialog.dismiss();*/
-               if(fileNameEditText.getText().toString().length()>0) {
-                   if (imageBitmap != null) {
-                       new createFileAsyncTask(mContext, instance, instance, fileNameEditText.getText().toString().trim(),imageBitmap, Constants.TYPE_JPG).execute();
-                   }
-               }
-               else {
-                   Utility.dispToast(mContext,"file name can't be blank");
-               }
-                  dialog.dismiss();
+                if(fileNameEditText.getText().toString().length()>0) {
+                    if (imageBitmap != null) {
+                        new createFileAsyncTask(mContext, instance, instance, fileNameEditText.getText().toString().trim(),imageBitmap, Constants.TYPE_JPG).execute();
+                    }
+                }
+                else {
+                    Utility.dispToast(mContext,"file name can't be blank");
+                }
+                dialog.dismiss();
 
             }
         });
@@ -317,7 +328,7 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
     @Override
     public void onThumbnailClick(Filter filter) {
 
-      // scannedImage.setImageBitmap(filter.processFilter(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.photo), 640, 640, false)));
+        // scannedImage.setImageBitmap(filter.processFilter(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.photo), 640, 640, false)));
         //scannedImage.setImageBitmap(filter.processFilter(imageBitmap));
         scannedImage.setImageBitmap(filter.processFilter(Bitmap.createScaledBitmap(imageBitmap, 640,640 ,false )));
         imageBitmapTosave=filter.processFilter(Bitmap.createScaledBitmap(imageBitmap, 640,640 ,false ));

@@ -1,11 +1,10 @@
 package com.mojodigi.smartcamscanner;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.arch.lifecycle.ViewModelProvider;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -70,8 +69,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.KeyStore;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.mojodigi.smartcamscanner.Constants.Constants.STORAGE_LOCATION;
 import static com.mojodigi.smartcamscanner.Util.StringUtils.getDefaultStorageLocation;
@@ -101,8 +100,8 @@ public class MainActivity extends AppCompatActivity
 
     int REQUEST_CODE_CHOOSE=99;
 
-   // List<Uri> mSelected;
-     public static ArrayList<String> mImagesUri = new ArrayList<>();;
+    // List<Uri> mSelected;
+    public static ArrayList<String> mImagesUri = new ArrayList<>();;
 
 
     private String mHomePath;
@@ -110,6 +109,7 @@ public class MainActivity extends AppCompatActivity
     private SharedPreferences mSharedPreferences;
     PagerAdapter adapter;
     ViewPager viewPager;
+
 
 
     //add vars
@@ -129,10 +129,14 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        mContext=MainActivity.this;
+        if(mContext==null) {
+            mContext = MainActivity.this;
+        }
         permissionStatus =mContext.getSharedPreferences("permissionStatus", MODE_PRIVATE);
-        instance=this;
+        instance = this;
+
         setSupportActionBar(toolbar);
         askForPermission();
 
@@ -154,7 +158,7 @@ public class MainActivity extends AppCompatActivity
             if (AddConstants.checkIsOnline(mContext))
             {
                 if(!webcaldone)
-                new WebCall().execute();
+                    new WebCall().execute();
 
             }
         }
@@ -222,10 +226,10 @@ public class MainActivity extends AppCompatActivity
         } else {
             //You already have the permission, just go ahead.
             initComponents();
-
-
         }
     }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -267,9 +271,9 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(mContext, "Unable to get Permission", Toast.LENGTH_LONG).show();
             }
         }
-
-
     }
+
+
 
     private void initComponents() {
 
@@ -288,7 +292,7 @@ public class MainActivity extends AppCompatActivity
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         viewPager = (ViewPager) findViewById(R.id.pager);
-         adapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+        adapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -325,9 +329,9 @@ public class MainActivity extends AppCompatActivity
 
 
 
-            }
+        }
 
-      AddMobUtils utils = new AddMobUtils();
+        AddMobUtils utils = new AddMobUtils();
         utils.dispFacebookBannerAdd(mContext, addprefs,MainActivity.this);
 
 
@@ -379,7 +383,16 @@ public class MainActivity extends AppCompatActivity
 //                        .setAction("Action", null).show();
 
 
-                onScanButtonClicked();
+
+                //Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+//                Intent cameraIntent = new Intent(MainActivity.this, ScanActivity.class);
+//                cameraIntent.putExtra(ScanActivity.EXTRA_BRAND_IMG_RES, R.drawable.ic_crop_white_24dp);
+//                cameraIntent.putExtra(ScanActivity.EXTRA_TITLE, "Crop Document");
+//                cameraIntent.putExtra(ScanActivity.EXTRA_ACTION_BAR_COLOR, R.color.colorPrimary);
+//                cameraIntent.putExtra(ScanActivity.EXTRA_LANGUAGE, "en");
+//                startActivityForResult(cameraIntent, REQUEST_CODE_SCAN);
+
+              onScanButtonClicked();
 
 
 
@@ -399,32 +412,61 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void onScanButtonClicked() {
-        Intent intent = new Intent(this, ScanActivity.class);
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        // Intent intent = new Intent(this, ScanActivity.class);
         intent.putExtra(ScanActivity.EXTRA_BRAND_IMG_RES, R.drawable.ic_crop_white_24dp);
         intent.putExtra(ScanActivity.EXTRA_TITLE, "Crop Document");
         intent.putExtra(ScanActivity.EXTRA_ACTION_BAR_COLOR, R.color.colorPrimary);
         intent.putExtra(ScanActivity.EXTRA_LANGUAGE, "en");
+
         startActivityForResult(intent, REQUEST_CODE_SCAN);
     }
+
+
+
+
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
 
         if (requestCode == REQUEST_CODE_SCAN && resultCode == Activity.RESULT_OK) {
-            String imgPath = data.getStringExtra(ScanActivity.RESULT_IMAGE_PATH);
-            bitmapToShare = Utils.getBitmapFromLocation(imgPath);
-           // scannedImage.setImageBitmap(bitmapToShare);
-            //scannedImage.setVisibility(View.VISIBLE);
+
+            Bitmap bitmapPhotoCamera = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                bitmapToShare = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
+                Constants.imageBitmap = bitmapToShare;
+            }else {
+                bitmapToShare = (Bitmap)data.getExtras().get("data");
+                Constants.imageBitmap = bitmapToShare;
+            }
 
             if (bitmapToShare != null) {
-                Intent intent = new Intent(mContext, ScannedImageActivity.class);
-              //  intent.putExtra("Image", bitmapToShare);
-                Constants.imageBitmap=bitmapToShare;
+                Constants.imageBitmap = bitmapToShare;
+                Intent intent = new Intent(mContext, CameraImageActivity.class);
+                intent.putExtra("BITMAP_PICK_CAMERA", bitmapToShare);
                 startActivity(intent);
             } else {
                 Utility.dispToast(mContext, "Please scan again");
             }
+
+
+
+//            String imgPath = data.getStringExtra(ScanActivity.RESULT_IMAGE_PATH);
+//            bitmapToShare = Utils.getBitmapFromLocation(imgPath);
+//
+//            // scannedImage.setImageBitmap(bitmapToShare);
+//            //scannedImage.setVisibility(View.VISIBLE);
+//
+//            if (bitmapToShare != null) {
+//                Intent intent = new Intent(mContext, ScannedImageActivity.class);
+//                //  intent.putExtra("Image", bitmapToShare);
+//                Constants.imageBitmap = bitmapToShare;
+//                startActivity(intent);
+//            } else {
+//                Utility.dispToast(mContext, "Please scan again");
+//            }
+
 
 
 
@@ -452,13 +494,13 @@ public class MainActivity extends AppCompatActivity
                 //if qr contains data
                 try {
                     //converting the data to json
-                       JSONObject obj = new JSONObject(result.getContents());
+                    JSONObject obj = new JSONObject(result.getContents());
 
-                         Intent intent = new Intent(mContext,BarCodeResultActivity.class);
-                          intent.putExtra(Constants.QrData, obj.toString());
-                          startActivity(intent);
+                    Intent intent = new Intent(mContext,BarCodeResultActivity.class);
+                    intent.putExtra(Constants.QrData, obj.toString());
+                    startActivity(intent);
 
-                   // Utility.dispToast(mContext, obj.toString());
+                    // Utility.dispToast(mContext, obj.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                     //if control comes here
@@ -503,6 +545,8 @@ public class MainActivity extends AppCompatActivity
     /**
      * Saves Current Image with grayscale filter
      */
+
+
    /* private void saveCurrentImageInGrayscale() {
         try {
             File sdCard = Environment.getExternalStorageDirectory();
@@ -525,6 +569,8 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }*/
+
+
 
    /* private void createPdf()
     {
@@ -592,9 +638,9 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
 
-                case R.id.action_create_folder:
+            case R.id.action_create_folder:
                 //Utility.dispToast(mContext, "create folder");
-                  createFolderDialog();
+                createFolderDialog();
                 break;
 
         }
@@ -603,6 +649,9 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+
+
+
 
     private void createFolderDialog() {
 
@@ -635,9 +684,15 @@ public class MainActivity extends AppCompatActivity
                     {
                         Utility.dispToast(mContext,getResources().getString(R.string.folder_success));
                         dialog.dismiss();
-                        Fragment page = (Fragment) adapter.instantiateItem(viewPager,viewPager.getCurrentItem());
-                        //((FolderFragment)page).updateFolderList();  // will work on it later;
-                        Constants.callUpdateMethod= true;
+
+                        Fragment page = (Fragment) adapter.instantiateItem(viewPager,  viewPager.getCurrentItem());
+                        //Log.e("Fragment " , ""+page);
+                        if (viewPager.getCurrentItem() == 1 && page != null) {
+                            ((FolderFragment) page).updateFolderList();
+                        }
+
+                        Constants.callUpdateMethod = true;
+
                         viewPager.setCurrentItem(1);
 
                     }
@@ -668,16 +723,16 @@ public class MainActivity extends AppCompatActivity
                 allFileFolder.mkdir();
 
             String pathTopdf = Constants.pdfFolderName;
-              File pdfFolder = new File(pathTopdf);
-              if (!pdfFolder.exists())
+            File pdfFolder = new File(pathTopdf);
+            if (!pdfFolder.exists())
                 pdfFolder.mkdir();
 
 
 
-              String pathToImages=Constants.imageFolderName;
-              File imgFolder=new File(pathToImages);
-               if (!imgFolder.exists())
-                   imgFolder.mkdir();
+            String pathToImages=Constants.imageFolderName;
+            File imgFolder=new File(pathToImages);
+            if (!imgFolder.exists())
+                imgFolder.mkdir();
 
 
 
@@ -722,13 +777,14 @@ public class MainActivity extends AppCompatActivity
                 startActivity(inten);
                 break;*/
             case R.id.nav_share:
-                  shareApp();
-                 break;
+                shareApp();
+                break;
 
             case  R.id.nav_privacy:
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.privacyUrl));
                 startActivity(browserIntent);
                 break;
+
             case R.id.nav_scan:
 
                 if(qrScan !=null) {
@@ -800,6 +856,7 @@ public class MainActivity extends AppCompatActivity
 
 
 
+    @SuppressLint("NewApi")
     public class WebCall extends AsyncTask<String,String,String>
     {
         @Override
@@ -855,10 +912,9 @@ public class MainActivity extends AppCompatActivity
                         if (mainJson.has("status")) {
                             String status = JsonParser.getkeyValue_Str(mainJson, "status");
 
-                            //String newVersion=JsonParser.getkeyValue_Str(mainJson,"appVersion");
-                            //addprefs.setValue(AddConstants.APP_VERSION, newVersion);
-                            addprefs.setValue(AddConstants.APP_VERSION, "1.29");
-
+                            String newVersion=JsonParser.getkeyValue_Str(mainJson,"appVersion");
+                            addprefs.setValue(AddConstants.APP_VERSION, newVersion);
+                            //addprefs.setValue(AddConstants.APP_VERSION, "1.10");
 
                             if (status.equalsIgnoreCase("true")) {
 
@@ -897,7 +953,7 @@ public class MainActivity extends AppCompatActivity
                                             // IN CASE OF EXCEPTION CONSIDER  FALSE AS THE VALUE WILL NOT BE TRUE,FALSE.
                                             addprefs.setValue(AddConstants.SHOW_ADD, false);
                                         }
-                                       // addprefs.setValue(AddConstants.APP_VERSION, newVersion);
+                                        // addprefs.setValue(AddConstants.APP_VERSION, newVersion);
                                         //addprefs.setValue(AddConstants.APP_VERSION, "1.22");
                                         addprefs.setValue(AddConstants.ADD_PROVIDER_ID, adProviderId);
                                         addprefs.setValue(AddConstants.APP_ID, appId_PublisherId);
@@ -913,7 +969,7 @@ public class MainActivity extends AppCompatActivity
                                             util.displayServerBannerAdd(addprefs, adContainer, mContext);
                                             // util.showInterstitial(addprefs,HomeActivity.this, interstitialAdId);
                                             //util.displayRewaredVideoAdd(addprefs,mContext, videoAdId);
-                                           webcaldone=true;
+                                            webcaldone=true;
 
                                         }
                                         else if (adProviderId.equalsIgnoreCase(AddConstants.InMobiProvideId))
@@ -928,10 +984,6 @@ public class MainActivity extends AppCompatActivity
                                             util.dispFacebookBannerAdd(mContext, addprefs,MainActivity.this);
                                             webcaldone=true;
                                         }
-
-
-
-
                                     } else {
                                         String message = JsonParser.getkeyValue_Str(mainJson, "message");
                                         Log.d("message", "" + message);
@@ -940,11 +992,9 @@ public class MainActivity extends AppCompatActivity
                                     String message = JsonParser.getkeyValue_Str(mainJson, "message");
 
                                     Log.d("message", "" + message);
-
                                 }
-
-
                             }
+
                             dispUpdateDialog();
                         }
 
@@ -997,7 +1047,6 @@ public class MainActivity extends AppCompatActivity
                         addprefs.setValue("displayedTime", System.currentTimeMillis());
                     }
 
-
                     TextView later = dialog.findViewById(R.id.idDialogLater);
                     TextView updateNow = dialog.findViewById(R.id.idDialogUpdateNow);
                     TextView idVersionDetailsText = dialog.findViewById(R.id.idVersionDetailsText);
@@ -1012,7 +1061,6 @@ public class MainActivity extends AppCompatActivity
                     updateNow.setTypeface(Utility.typeFace_calibri(mContext));
 
                     idAppVersionText.setText(newVersion);
-
 
                     later.setOnClickListener(new View.OnClickListener() {
                         @Override

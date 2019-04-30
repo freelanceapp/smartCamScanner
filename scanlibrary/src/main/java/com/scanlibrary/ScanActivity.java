@@ -8,6 +8,8 @@ import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
+import com.scanlibrary.mojodigi.R;
+
 import java.util.Locale;
 
 public class ScanActivity extends Activity {
@@ -21,6 +23,7 @@ public class ScanActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_scan);
 
         int titleImgRes = getIntent().getExtras().getInt(EXTRA_BRAND_IMG_RES);

@@ -44,11 +44,13 @@
                 android:minWidth="40dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:background="@drawable/cornered_edges"
-                android:text="@string/save_current"
+                android:text="@string/save_countinue"
                 android:textAllCaps="false"
-                android:textColor="@color/white" />
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:layout_marginLeft="2dp" />
 
             <Button
                 android:id="@+id/rotateButton"
@@ -56,13 +58,15 @@
                 android:minWidth="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:background="@drawable/cornered_edges"
                 android:paddingStart="2dp"
                 android:paddingEnd="2dp"
                 android:text="@string/rotate"
+                android:singleLine="true"
                 android:textAllCaps="false"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:layout_marginLeft="4dp" />
 
             <ImageView
                 android:id="@+id/previousImageButton"
@@ -75,15 +79,18 @@
                 android:layout_gravity="center"
                 android:tint="@color/colorAccent"
                 app:srcCompat="@drawable/ic_navigate_before_white_24dp"
-                tools:targetApi="lollipop" />
+                tools:targetApi="lollipop"
+                android:layout_marginLeft="5dp"
+                tools:ignore="VectorDrawableCompat" />
 
             <TextView
                 android:id="@+id/imagecount"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="8"
+                android:layout_weight="5"
                 android:gravity="center"
-                android:text="@string/showing_image" />
+                android:singleLine="true"
+                android:text="@string/image_count" />
 
             <ImageView
                 android:id="@+id/nextimageButton"
@@ -95,7 +102,8 @@
                 android:layout_gravity="center"
                 android:tint="@color/colorAccent"
                 app:srcCompat="@drawable/ic_navigate_next_black_24dp"
-                tools:targetApi="lollipop" />
+                tools:targetApi="lollipop"
+                tools:ignore="VectorDrawableCompat" />
 
         </LinearLayout>
 

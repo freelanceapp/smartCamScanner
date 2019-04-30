@@ -1,6 +1,7 @@
 package com.mojodigi.smartcamscanner;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -57,7 +58,7 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
 
 
     Button cropButton,rotateButton;
-    ImageView previousImageButton,nextimageButton;
+    ImageView previousImageButton, nextimageButton;
     TextView imagecount;
     TextView mImagecount;
     CropImageView mCropImageView;
@@ -66,6 +67,7 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
 
     Dialog dialog;
 
+    @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,6 +105,7 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
         cropButton=findViewById(R.id.cropButton);
         rotateButton=findViewById(R.id.rotateButton);
         previousImageButton=findViewById(R.id.previousImageButton);
+
         nextimageButton=findViewById(R.id.nextimageButton);
         imagecount=findViewById(R.id.imagecount);
         mCropImageView=findViewById(R.id.cropImageView);
@@ -149,7 +152,29 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
     }
 
 
+    public void saveButtonClicked() {
 
+        String root = Environment.getExternalStorageDirectory().toString();
+        //File myDir = new File(root + pdfDirectory);
+        File myDir = new File(pdfFolderName+"/");
+        boolean st=myDir.exists();
+        Uri uri = mCropImageView.getImageUri();
+
+        if (uri == null) {
+
+            Utility.dispToast(mContext,getResources().getString(R.string.error_occurred ));
+            return;
+        }
+
+        String path = uri.getPath();
+        String fname = "cropped_im";
+        if (path != null){}
+        fname = "cropped_" + FileUtils.getFileName(path);
+
+        File file = new File(myDir, fname);
+        Uri fileuri=Uri.fromFile(file);
+        mCropImageView.saveCroppedImageAsync(fileuri);
+    }
 
 
     @Override
@@ -168,11 +193,15 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
                 setResult(Activity.RESULT_CANCELED);
                 finish();
                 return true;
+
             case R.id.action_done:
                 mFinishedclicked = true;
                 cropButtonClicked();
                 return true;
+
             case R.id.action_skip:
+                /*Surya*/
+                mFinishedclicked = false;
                 mCurrentImageEdited = false;
                 nextImageClicked();
                 return true;
@@ -181,13 +210,18 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
     }
 
     public void nextImageClicked() {
-        if (!mCurrentImageEdited) {
-            mCurrentImageIndex = (mCurrentImageIndex + 1) % mImages.size();
-            setImage(mCurrentImageIndex);
-        } else {
-            //showSnackbar(this, R.string.save_first);
-            Utility.dispToast(mContext, getResources().getString(R.string.save_first));
-        }
+        mFinishedclicked=false;
+        mCurrentImageIndex = (mCurrentImageIndex + 1) % mImages.size();
+        setImage(mCurrentImageIndex);
+
+        /*Surya*/
+//        if (!mCurrentImageEdited) {
+//            mCurrentImageIndex = (mCurrentImageIndex + 1) % mImages.size();
+//            setImage(mCurrentImageIndex);
+//        } else {
+//            //showSnackbar(this, R.string.save_first);
+//            Utility.dispToast(mContext, getResources().getString(R.string.save_first));
+//        }
     }
 
     /**
@@ -290,7 +324,9 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
         if (index < 0 || index >= mImages.size())
             return;
 
-        mImagecount.setText(getString(R.string.cropImage_activityTitle) + " " + (index + 1) + " of " + mImages.size());
+       // mImagecount.setText(getString(R.string.cropImage_activityTitle) + " " + (index + 1) + " of " + mImages.size());
+        //mImagecount.setText("Image" + " " + (index + 1) + " of " + mImages.size());
+        mImagecount.setText(" " + (index + 1) + " of " + mImages.size());
         mCropImageView.setImageUriAsync(mCroppedImageUris.get(index));
     }
 
@@ -302,36 +338,60 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
         switch (id)
         {
             case R.id.rotateButton:
+                mFinishedclicked=false;
                 mCurrentImageEdited = true;
+
                 mCropImageView.rotateImage(90);
                 break;
 
             case R.id.nextimageButton:
-                if (!mCurrentImageEdited) {
-                    mCurrentImageIndex = (mCurrentImageIndex + 1) % mImages.size();
-                    setImage(mCurrentImageIndex);
-                } else {
-                    //showSnackbar(this, R.string.save_first);
-                    Utility.dispToast(mContext, getResources().getString(R.string.save_first));
-                }
+
+                mFinishedclicked=false;
+                mCurrentImageEdited = false;
+
+                mCurrentImageIndex = (mCurrentImageIndex + 1) % mImages.size();
+                setImage(mCurrentImageIndex);
+
+                /*Surya*/
+//                if (!mCurrentImageEdited) {
+//                    mCurrentImageIndex = (mCurrentImageIndex + 1) % mImages.size();
+//                    setImage(mCurrentImageIndex);
+//                } else {
+//                    //showSnackbar(this, R.string.save_first);
+//                    Utility.dispToast(mContext, getResources().getString(R.string.save_first));
+//                }
                 break;
 
             case R.id.previousImageButton:
-                if (!mCurrentImageEdited) {
-                    if (mCurrentImageIndex == 0) {
-                        mCurrentImageIndex = mImages.size();
-                    }
-                    mCurrentImageIndex = (mCurrentImageIndex - 1) % mImages.size();
-                    setImage(mCurrentImageIndex);
-                } else {
-                    //showSnackbar(this, R.string.save_first);
-                    Utility.dispToast(mContext, getResources().getString(R.string.save_first));
+                mFinishedclicked=false;
+                mCurrentImageEdited = false;
+
+                if (mCurrentImageIndex == 0) {
+                    mCurrentImageIndex = mImages.size();
                 }
+                mCurrentImageIndex = (mCurrentImageIndex - 1) % mImages.size();
+                setImage(mCurrentImageIndex);
+
+                /*Surya*/
+//                if (!mCurrentImageEdited) {
+//                    if (mCurrentImageIndex == 0) {
+//                        mCurrentImageIndex = mImages.size();
+//                    }
+//                    mCurrentImageIndex = (mCurrentImageIndex - 1) % mImages.size();
+//                    setImage(mCurrentImageIndex);
+//                } else {
+//                    //showSnackbar(this, R.string.save_first);
+//                    Utility.dispToast(mContext, getResources().getString(R.string.save_first));
+//                }
 
                 break;
 
             case R.id.cropButton:
-                  cropButtonClicked();
+
+                mCurrentImageEdited = false;
+                mFinishedclicked=false;
+                  //cropButtonClicked();
+                saveButtonClicked();
                 break;
         }
     }

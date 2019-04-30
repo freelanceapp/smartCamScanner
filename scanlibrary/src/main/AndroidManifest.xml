@@ -1,21 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.scanlibrary"
+<manifest xmlns:tools="http://schemas.android.com/tools"
+          package="com.scanlibrary.mojodigi"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="true"/>
+        android:required="true"
+        tools:ignore="UnusedAttribute" />
 
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-    <application android:allowBackup="true">
+    <application >
 
         <activity
-            android:name=".ScanActivity"
-            android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
+            android:name="com.scanlibrary.ScanActivity"
+            android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
+            android:screenOrientation="portrait"
+             >
         </activity>
+
+
+
     </application>
 
 </manifest>

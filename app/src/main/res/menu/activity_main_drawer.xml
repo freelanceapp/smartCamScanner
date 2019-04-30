@@ -13,7 +13,7 @@
 
             android:id="@+id/nav_scan"
             android:icon="@drawable/ic_qr_code"
-            android:title="Scan qr/bar code" />
+            android:title="Scan QR/Barcode" />
 
         <item
             android:id="@+id/nav_share"

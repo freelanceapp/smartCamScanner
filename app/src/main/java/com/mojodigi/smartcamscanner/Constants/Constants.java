@@ -13,9 +13,9 @@ public class Constants {
 
     public static final String parentfolder=Environment.getExternalStorageDirectory()+"/SmartScanner/";
 
-    public static final  String pdfFolderName= parentfolder+"Pdfs";
-    public static final  String imageFolderName= parentfolder+"Images";
-    public static final  String allFilesFolder= parentfolder+"All files";
+    public static final  String pdfFolderName = parentfolder+"Pdfs";
+    public static final  String imageFolderName = parentfolder+"Images";
+    public static final  String allFilesFolder = parentfolder+"All files";
 
     public static final String IntentfilePath="path";
 

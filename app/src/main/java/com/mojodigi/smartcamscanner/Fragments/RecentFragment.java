@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -64,7 +65,7 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
 
     static RecentFragment instance;
 
-  Context mContext;
+    Context mContext;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragmnet_recentfile, container, false);
@@ -74,12 +75,10 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-            mContext=getActivity();
+        mContext=getActivity();
 
 
-
-
-            }
+    }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
@@ -91,7 +90,7 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
                 mActionMode.finish();
         }
 
-        }
+    }
 
 
     @Override
@@ -102,7 +101,8 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
         recyclerView =view.findViewById(R.id.recycler_view);
         nodataFound=view.findViewById(R.id.nodataFound);
 
-          instance=this;
+
+        instance=this;
 
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(mContext, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
@@ -133,7 +133,7 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
         }));
 
 
-        }
+    }
 
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -178,7 +178,7 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
                     }
                     return true;
                 case R.id.action_select:
-                  if(recent_ImgList.size()==multiselect_list.size() || isUnseleAllEnabled==true)
+                    if(recent_ImgList.size()==multiselect_list.size() || isUnseleAllEnabled==true)
                         unSelectAll();
                     else
                         selectAll();
@@ -385,22 +385,26 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
         }
     }
 
+
     @Override
     public void onResume() {
         super.onResume();
         finishActionMode();
         new AsynctaskUtility<fileModel>(mContext,this,Constants.REQUST_RECENT_FILE).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
+
+
     private void finishActionMode()
     {
         if(mActionMode!=null)
             mActionMode.finish();
     }
 
+
     @Override
     public void onrecentSelected(fileModel recentFile) {
 
-       // Utility.dispToast(mContext, recentFile.getFileName());
+        // Utility.dispToast(mContext, recentFile.getFileName());
         if(recentFile.getIsImgs())
         {
 
@@ -413,11 +417,8 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
             Intent intent=new Intent(mContext,PDFViewActivity.class);
             intent.putExtra(Constants.IntentfilePath, fpath);
             startActivity(intent);
-
         }
-
-
-        }
+    }
 
     @Override
     public void processFinish(ArrayList output) {
@@ -454,11 +455,11 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
             {
 
                 ArrayList<File> filesTobeDleted=new ArrayList<>();
-                 for(int i=0;i<multiselect_list.size();i++)
-                 {
-                     filesTobeDleted.add(new File(multiselect_list.get(i).getFilePath()));
-                 }
-                 new deleteFileAsyncTask(mContext,this,filesTobeDleted).execute();
+                for(int i=0;i<multiselect_list.size();i++)
+                {
+                    filesTobeDleted.add(new File(multiselect_list.get(i).getFilePath()));
+                }
+                new deleteFileAsyncTask(mContext,this,filesTobeDleted).execute();
 
                 if(mActionMode!=null)
                 {
@@ -485,7 +486,7 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
 
     @Override
     public void ondeleteSucceed(ArrayList<String> deletedFiles) {
-             //relaod the data if flie is  deleted
+        //relaod the data if flie is  deleted
         // for the time beo=ing the varibale deletedFiles is not being used but it contains the path of the files deleted
         new AsynctaskUtility<fileModel>(mContext,this,Constants.REQUST_RECENT_FILE).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }

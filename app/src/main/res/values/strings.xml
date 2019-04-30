@@ -1,9 +1,11 @@
 <resources>
+
+
     <string name="app_name">Smart Scanner</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Smart Scanner</string>
-   <!-- <string name="nav_header_subtitle">android.studio@android.com</string>-->
+    <!-- <string name="nav_header_subtitle">android.studio@android.com</string>-->
     <string name="nav_header_desc">Navigation header</string>
     <string name="create_folder">Create folder</string>
     <string name="action_save">Save</string>
@@ -26,9 +28,11 @@
     <string name="filter_file_name">%s_%s.jpg</string>
 
     <string name="action_sort">Sort</string>
+
     <string name="action_search">Search</string>
     <string name="loading_msg">Loading...</string>
     <string name="save_current">Save</string>
+    <string name="save_countinue">Save &amp; Countinue</string>
     <string name="done">Done</string>
     <string name="skip_text">Skip</string>
     <string name="error_occurred">Error Occurred</string>
@@ -55,6 +59,7 @@
     <string name="cropImage_activityTitle">Crop Image</string>
     <string name="previous_image_content_desc">Previous Image</string>
     <string name="showing_image">Showing %1$d of %2$d image(s)</string>
+    <string name="image_count"> 1 of 2</string>
     <string name="nextimage_contentdesc">Next Image</string>
 
 
@@ -99,9 +104,6 @@
     </string-array>
 
 
-
-
-
     <!-- demo add ids -->
     <!--
 <string name="admob_app_id">ca-app-pub-5603925957932903~3576315291</string>
@@ -120,4 +122,16 @@
 
     <!--actual add id for FileHunt runningAccount -->
 
+
+
+    <string name="document_scann_lib_name" translatable="false">ScanLibrary</string>
+    <string name="finish">Finish</string>
+    <string name="crop">Crop</string>
+    <string name="rotate">Rotate</string>
+    <string name="cant_crop">Can\'t crop the image, change the points</string>
+    <string name="transforming">Transforming...</string>
+
+    <string name="mode_none">None</string>
+    <string name="mode_black_white">Black &amp; White</string>
+    <string name="mode_magic">Magic</string>
 </resources>

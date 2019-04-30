@@ -32,12 +32,12 @@
     <color name="actionbar_wood">#ffb3aa86</color>
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
-    <color name="foreground_material_dark">@color/white</color>
+    <color name="foreground_material_dark">#ffffff</color>
     <color name="foreground_material_light">@color/black</color>
     <color name="background_material_dark">@color/material_grey_850</color>
     <color name="background_material_light">@color/material_grey_50</color>
     <color name="background_floating_material_dark">@color/material_grey_800</color>
-    <color name="background_floating_material_light">@color/white</color>
+    <color name="background_floating_material_light">#ffffff</color>
     <color name="primary_material_dark">@color/material_grey_900</color>
     <color name="primary_material_light">@color/material_grey_100</color>
     <color name="primary_dark_material_dark">@color/black</color>
@@ -67,6 +67,7 @@
     <color name="material_blue_grey_900">#ff263238</color>
     <color name="material_blue_grey_950">#ff21272b</color>
 
+    <color name="white">#ffffff</color>
     <color name="grey_ebebeb">#ebebeb</color>
 
 
@@ -75,7 +76,6 @@
     <!--takem from filemanager app-->
 
     <color name="strgtextclr">#89000000</color>
-    <color name="white">#ffffff</color>
     <color name="color_icon">#26A69A</color>
     <color name="settings_separator">#eeeded</color>
 
@@ -90,4 +90,5 @@
     <color name="placeholder_background">#222322</color>
 
     <color name="tickColor">#fff605</color>
+
 </resources>

@@ -1,5 +1,6 @@
 package com.scanlibrary;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
@@ -23,8 +24,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.davemorrissey.labs.subscaleview.ScaleImageView;
+//import com.davemorrissey.labs.subscaleview.ScaleImageView;
+import com.scanlibrary.mojodigi.R;
 
 import org.opencv.core.Point;
 
@@ -608,6 +610,7 @@ public class ScanFragment extends Fragment {
     // Inner and Anonymous Classes
     // ===========================================================
 
+    @SuppressLint("NewApi")
     private class DocumentFromBitmapTask extends AsyncTask<Void, Void, DocumentFromBitmapTaskResult> {
 
         private final Bitmap bitmap;
@@ -666,6 +669,7 @@ public class ScanFragment extends Fragment {
         }
     }
 
+    @SuppressLint("NewApi")
     private class RotatingTask extends AsyncTask<Void, Void, RotatingTaskResult> {
 
         private final Bitmap takenPhotoBitmap;
@@ -734,6 +738,7 @@ public class ScanFragment extends Fragment {
         }
     }
 
+    @SuppressLint("NewApi")
     private class CropTask extends AsyncTask<Void, Void, CropTaskResult> {
 
         private final Bitmap bitmap;
