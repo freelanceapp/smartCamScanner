@@ -1,0 +1,31 @@
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+<RelativeLayout
+    android:background="@drawable/custom_ripple"
+    android:paddingTop="@dimen/dp10"
+    android:paddingLeft="@dimen/dp10"
+    android:paddingBottom="@dimen/dp10"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+ <ImageView
+     android:id="@+id/fImageView"
+     android:src="@mipmap/ic_launcher_round"
+     android:layout_width="40dp"
+     android:layout_height="40dp" />
+    <TextView
+        android:id="@+id/fNameView"
+        android:layout_marginLeft="@dimen/dp10"
+        android:layout_toRightOf="@+id/fImageView"
+        android:text="folderName "
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="@dimen/sp16"
+        android:textColor="#ee534f"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</RelativeLayout>
+</LinearLayout>

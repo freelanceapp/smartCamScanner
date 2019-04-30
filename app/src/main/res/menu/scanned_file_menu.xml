@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_rotate"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_rotate_90_degrees_ccw_white_24dp"
+        android:title="@string/rotate"/>
+
+    <item
+        android:id="@+id/action_crop"
+        android:icon="@drawable/ic_crop_white_24dp"
+        app:showAsAction="always"
+        android:title="@string/crop"/>
+
+    <item
+        android:id="@+id/action_save"
+        android:orderInCategory="100"
+        android:title="@string/action_save"
+        android:icon="@drawable/ic_save_black_24dp"
+        app:showAsAction="always" />
+
+
+</menu>
+
+<!--
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    &lt;!&ndash;<item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/create_folder"
+        app:showAsAction="never"
+        android:visible="false"
+        />&ndash;&gt;
+
+    <item
+        android:id="@+id/action_save"
+        android:orderInCategory="100"
+        android:title="@string/action_save"
+        android:icon="@drawable/ic_save_black_24dp"
+        app:showAsAction="always" />
+</menu>
+-->
