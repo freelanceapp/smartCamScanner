@@ -5,12 +5,12 @@
     <item
         android:id="@+id/action_rotate"
         app:showAsAction="always"
-        android:icon="@drawable/ic_rotate_90_degrees_ccw_white_24dp"
+        android:icon="@mipmap/ic_rotate_90_degrees_ccw_white_24dp"
         android:title="@string/rotate"/>
 
     <item
         android:id="@+id/action_crop"
-        android:icon="@drawable/ic_crop_white_24dp"
+        android:icon="@mipmap/ic_crop_white_24dp"
         app:showAsAction="always"
         android:title="@string/crop"/>
 

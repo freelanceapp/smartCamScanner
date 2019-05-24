@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.mojodigi.smartcamscanner.Constants.Constants;
 import com.mojodigi.smartcamscanner.Model.fileModel;
 import com.mojodigi.smartcamscanner.R;
 import com.mojodigi.smartcamscanner.Util.Utility;
@@ -21,10 +22,10 @@ import java.util.ArrayList;
 
 public class MultiSelectAdapter_ListFile extends RecyclerView.Adapter<MultiSelectAdapter_ListFile.MyViewHolder>  implements Filterable {
 
-    public ArrayList<fileModel> ListFileList=new ArrayList<>();
-    public ArrayList<fileModel> ListFileListfiltered=new ArrayList<>();
-    public ArrayList<fileModel> selected_ListFileList=new ArrayList<>();
-    private ListFileListener listener;
+    public ArrayList<fileModel> fileList=new ArrayList<>();
+    public ArrayList<fileModel> fileListfiltered=new ArrayList<>();
+    public ArrayList<fileModel> selected_FileList=new ArrayList<>();
+    private fileListener listener;
     Context mContext;
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
@@ -48,7 +49,7 @@ public class MultiSelectAdapter_ListFile extends RecyclerView.Adapter<MultiSelec
                     // send selected ListFile in callback
                     int pos=getAdapterPosition();
                     if(pos!= RecyclerView.NO_POSITION)
-                        listener.onListFileSelected(ListFileListfiltered.get(getAdapterPosition()));
+                        listener.onListFileSelected(fileListfiltered.get(getAdapterPosition()));
                 }
             });
 
@@ -57,12 +58,12 @@ public class MultiSelectAdapter_ListFile extends RecyclerView.Adapter<MultiSelec
         }
     }
 
-    public MultiSelectAdapter_ListFile(Context context, ArrayList<fileModel> ListFileList, ArrayList<fileModel> selectedListFileList , ListFileListener listener) {
+    public MultiSelectAdapter_ListFile(Context context, ArrayList<fileModel> fileList, ArrayList<fileModel> selectedfileList , fileListener listener) {
 
         this.mContext=context;
-        this.ListFileList = ListFileList;
-        this.ListFileListfiltered=ListFileList;
-        this.selected_ListFileList = selectedListFileList;
+        this.fileList = fileList;
+        this.fileListfiltered=fileList;
+        this.selected_FileList = selectedfileList;
         this.listener = listener;
 
 
@@ -80,18 +81,24 @@ public class MultiSelectAdapter_ListFile extends RecyclerView.Adapter<MultiSelec
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        fileModel model = ListFileList.get(position);
+        fileModel model = fileList.get(position);
 
-        if(model.getIsImgs())
-            Glide.with(mContext).load(model.getFilePath()).into(holder.imageView);
-        else
-            holder.imageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_pdf));
-
-
+        String str=Utility.getFileExtensionfromPath(model.getFilePath());
+        System.out.print(""+str);
+        if(Utility.getFileExtensionfromPath(model.getFilePath()).equalsIgnoreCase(Constants.hiddenFileExtension))
+        {
+            holder.imageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_hiddenfile_icon));// set icon here
+        }
+        else {
+            if (model.getIsImgs())
+                Glide.with(mContext).load(model.getFilePath()).into(holder.imageView);
+            else
+                holder.imageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_pdf));
+        }
 
         holder.fNameView.setText(model.getFileName());
 
-        if(selected_ListFileList.contains(ListFileList.get(position)))
+        if(selected_FileList.contains(fileList.get(position)))
             holder.ticksymbol.setVisibility(View.VISIBLE);
         else
             holder.ticksymbol.setVisibility(View.GONE);
@@ -101,7 +108,7 @@ public class MultiSelectAdapter_ListFile extends RecyclerView.Adapter<MultiSelec
 
     @Override
     public int getItemCount() {
-        return ListFileList.size();
+        return fileList.size();
     }
 
     @Override
@@ -117,33 +124,33 @@ public class MultiSelectAdapter_ListFile extends RecyclerView.Adapter<MultiSelec
             protected FilterResults performFiltering(CharSequence charSequence) {
                 String charString = charSequence.toString();
                 if (charString.isEmpty()) {
-                    ListFileListfiltered = ListFileList;
+                    fileListfiltered = fileList;
                 } else {
                     ArrayList<fileModel> filteredList = new ArrayList<>();
-                    for (fileModel row : ListFileList) {
+                    for (fileModel row : fileList) {
                         // search condition here
                         if (row.getFileName().toLowerCase().contains(charString.toLowerCase()) ) {
                             filteredList.add(row);
                         }
                     }
 
-                    ListFileListfiltered = filteredList;
+                    fileListfiltered = filteredList;
                 }
 
                 FilterResults filterResults = new FilterResults();
-                filterResults.values = ListFileListfiltered;
+                filterResults.values = fileListfiltered;
                 return filterResults;
             }
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                ListFileListfiltered = (ArrayList<fileModel>) filterResults.values;
+                fileListfiltered = (ArrayList<fileModel>) filterResults.values;
                 notifyDataSetChanged();
             }
         };
     }
 
-    public interface ListFileListener {
+    public interface fileListener {
         void onListFileSelected(fileModel contact);
     }
 

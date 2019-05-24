@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +29,7 @@ import com.mojodigi.smartcamscanner.Adapter.MultiSelectAdapter_ListFile;
 import com.mojodigi.smartcamscanner.AddsUtility.AddConstants;
 import com.mojodigi.smartcamscanner.AddsUtility.AddMobUtils;
 import com.mojodigi.smartcamscanner.AddsUtility.SharedPreferenceUtil;
+import com.mojodigi.smartcamscanner.AsyncTasks.decryptAsynscTask;
 import com.mojodigi.smartcamscanner.AsyncTasks.deleteFileAsyncTask;
 import com.mojodigi.smartcamscanner.AsyncTasks.getFolderFilesAsyncTask;
 import com.mojodigi.smartcamscanner.Constants.Constants;
@@ -42,7 +42,7 @@ import com.mojodigi.smartcamscanner.Util.renameUtility;
 import java.io.File;
 import java.util.ArrayList;
 
-public class Activity_File_List  extends AppCompatActivity implements getFolderFilesAsyncTask.fileListListener , AlertDialogHelper.AlertDialogListener ,MultiSelectAdapter_ListFile.ListFileListener,deleteFileAsyncTask.deleteListener,renameUtility.reNameListener {
+public class Activity_File_List  extends AppCompatActivity implements getFolderFilesAsyncTask.fileListListener , AlertDialogHelper.AlertDialogListener ,MultiSelectAdapter_ListFile.fileListener,deleteFileAsyncTask.deleteListener,renameUtility.reNameListener, decryptAsynscTask.decryptListener {
     private static boolean fileStatus;
     Context mContext;
     RecyclerView recyclerView;
@@ -62,7 +62,7 @@ public class Activity_File_List  extends AppCompatActivity implements getFolderF
 
     TextView nodataFound;
     String folderPath;
-
+    File fileToDelete;
 
     SharedPreferenceUtil addprefs;
     View adContainer;
@@ -190,7 +190,7 @@ public class Activity_File_List  extends AppCompatActivity implements getFolderF
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             // Inflate a menu resource providing context menu items
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.menu_multi_select, menu);
+            inflater.inflate(R.menu.menu_multi_select_file_list, menu);
             context_menu = menu;
             return true;
         }
@@ -287,8 +287,8 @@ public class Activity_File_List  extends AppCompatActivity implements getFolderF
 
     public void refreshAdapter()
     {
-        multiSelectAdapter.selected_ListFileList=multiselect_list;
-        multiSelectAdapter.ListFileList=file_List;
+        multiSelectAdapter.selected_FileList=multiselect_list;
+        multiSelectAdapter.fileList=file_List;
         multiSelectAdapter.notifyDataSetChanged();
          selectMenuChnage();
         //finish action mode when user deselect files one by one ;
@@ -506,20 +506,27 @@ public class Activity_File_List  extends AppCompatActivity implements getFolderF
     }
 
     @Override
-    public void onListFileSelected(fileModel contact) {
+    public void onListFileSelected(fileModel filemodel) {
 
+        if(!filemodel.getFilePath().endsWith(Constants.hiddenFileExtension)) {
+            if (!filemodel.getIsImgs()) {
+                Intent intent = new Intent(mContext, PDFViewActivity.class);
+                intent.putExtra(Constants.IntentfilePath, filemodel.getFilePath());
+                startActivity(intent);
+            } else {
+                //display  images
+                Utility.OpenFileWithNoughtAndAll(filemodel.getFilePath(), mContext, getResources().getString(R.string.file_provider_authority));
 
-        if(!contact.getIsImgs())
-        {
-            Intent intent=new Intent(mContext,PDFViewActivity.class);
-            intent.putExtra(Constants.IntentfilePath, contact.getFilePath());
-            startActivity(intent);
+            }
         }
         else {
-            //display  images
-            Utility.OpenFileWithNoughtAndAll(contact.getFilePath(),mContext,getResources().getString(R.string.file_provider_authority));
-
+            new decryptAsynscTask(mContext, new File[]{new File(filemodel.getFilePath().toString())}, this, Constants.encryptionPassword).execute();
         }
+
+
+
+
+
     }
 
     @Override
@@ -661,6 +668,43 @@ public class Activity_File_List  extends AppCompatActivity implements getFolderF
     {
         if(mActionMode!=null)
             mActionMode.finish();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if(fileToDelete!=null) {
+            fileToDelete.delete();  // delete  the sown file;
+            fileToDelete = null;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if(fileToDelete!=null)
+            fileToDelete.delete();
+
+    }
+
+    @Override
+    public void OnDeCryptFinish(File fileDecrypted) {
+
+        if(fileDecrypted !=null)
+        {
+           fileToDelete=fileDecrypted;
+
+            if (fileDecrypted.getAbsolutePath().endsWith("pdf")) {
+                Intent intent = new Intent(mContext, PDFViewActivity.class);
+                intent.putExtra(Constants.IntentfilePath, fileDecrypted.getAbsolutePath());
+                startActivity(intent);
+            } else {
+                //display  images
+                Utility.OpenFileWithNoughtAndAll(fileDecrypted.getAbsolutePath(), mContext, getResources().getString(R.string.file_provider_authority));
+
+            }
+        }
     }
 
 

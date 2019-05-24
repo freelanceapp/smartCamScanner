@@ -16,6 +16,19 @@ public class Constants {
     public static final  String pdfFolderName = parentfolder+"Pdfs";
     public static final  String imageFolderName = parentfolder+"Images";
     public static final  String allFilesFolder = parentfolder+"All files";
+    public static final  String hiddenFilesFolder = parentfolder+"Hidden files";
+
+
+
+    //private  module  vars
+    public static  String passDir=".mojo_Digi";
+    public static String passwordFile="scanner.txt";
+    public static  String passwordFileDes="scanner.des";
+    public static String encryptionPassword="x!23ghjt@#";
+    //private  module  vars
+
+  public static final String hiddenFileExtension="des";
+    public static boolean isAsyncOperationStopped=false;
 
     public static final String IntentfilePath="path";
 
@@ -46,4 +59,7 @@ public class Constants {
 
     public static String QrData="QrData";
     public static boolean callUpdateMethod;
+
+    public static String reoderData="data";
+    public static boolean isFromORderActivity;
 }

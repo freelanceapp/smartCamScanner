@@ -122,11 +122,14 @@ public class getFolderFilesAsyncTask  <T> extends AsyncTask<Void, Void, ArrayLis
                             model.setFileModifiedDate(Utility.LongToDate((file.lastModified())));
                             model.setFilePath(file.getPath());
                             model.setDateToSort(file.lastModified());
-                            if(file.getAbsolutePath().endsWith("jpg"))
-                            {
-                                model.setIsImgs(true);
+                            String ext=Utility.getFileExtensionfromPath(file.getAbsolutePath());
+                            // hidden files will not be included in all  files folder;
+                            if(!ext.equalsIgnoreCase(Constants.hiddenFileExtension)) {
+                                if (file.getAbsolutePath().endsWith("jpg")) {
+                                    model.setIsImgs(true);
+                                }
+                                allFilesList.add(model);
                             }
-                            allFilesList.add(model);
 
 
                     } else if (file.isDirectory()) {

@@ -1,2 +1,1 @@
-include ':app', ':scanlibraryNew'
-project(':scanlibraryNew').projectDir = new File('scanlibrary')
+include ':app'

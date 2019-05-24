@@ -23,16 +23,20 @@ import com.mojodigi.smartcamscanner.Adapter.MultiSelectAdapter_Folder;
 import com.mojodigi.smartcamscanner.AsyncTasks.deleteFileAsyncTask;
 import com.mojodigi.smartcamscanner.AsyncTasks.getFolderAsyncTask;
 import com.mojodigi.smartcamscanner.Constants.Constants;
+import com.mojodigi.smartcamscanner.LockerPasswordActivity;
+import com.mojodigi.smartcamscanner.MainActivity;
 import com.mojodigi.smartcamscanner.Model.folder_Model;
 import com.mojodigi.smartcamscanner.R;
 import com.mojodigi.smartcamscanner.Util.AlertDialogHelper;
+import com.mojodigi.smartcamscanner.Util.EncryptDialogUtility;
 import com.mojodigi.smartcamscanner.Util.RecyclerItemClickListener;
 import com.mojodigi.smartcamscanner.Util.Utility;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 
-public class FolderFragment extends Fragment implements getFolderAsyncTask.foldetlistListener ,MultiSelectAdapter_Folder.folderListener,AlertDialogHelper.AlertDialogListener ,deleteFileAsyncTask.deleteListener {
+public class FolderFragment extends Fragment implements getFolderAsyncTask.foldetlistListener ,MultiSelectAdapter_Folder.folderListener,AlertDialogHelper.AlertDialogListener ,deleteFileAsyncTask.deleteListener, EncryptDialogUtility.EncryptDialogListener {
 
 
     RecyclerView recyclerView;
@@ -41,7 +45,7 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
     ArrayList<folder_Model> folder_List = new ArrayList<>();
     ArrayList<folder_Model> multiselect_list = new ArrayList<>();
 
-
+    public static FolderFragment instance;
     TextView nodataFound;
 
     ActionMode mActionMode;
@@ -50,7 +54,7 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
     AlertDialogHelper alertDialogHelper;
     boolean isUnseleAllEnabled = false;
 
-
+    folder_Model folderData;
 
 
     @Override
@@ -70,7 +74,7 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
         mContext=getActivity();
         recyclerView =view.findViewById(R.id.recycler_view);
         nodataFound=view.findViewById(R.id.nodataFound);
-
+                 instance=FolderFragment.this;
         alertDialogHelper =new AlertDialogHelper(getActivity(),this);
 
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(mContext, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
@@ -144,13 +148,15 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
                     if(multiselect_list.size()>=1) {
                         int mFileCount = multiselect_list.size();
                         String msgDeleteFile = mFileCount > 1 ? mFileCount + " " + getResources().getString(R.string.delfolders) : mFileCount + " " + getResources().getString(R.string.delfolder);
-                        if(multiselect_list.get(0).getFolderPath().contains(Constants.allFilesFolder) || multiselect_list.get(0).getFolderPath().contains(Constants.pdfDirectory) ||  multiselect_list.get(0).getFolderPath().contains(Constants.imageFolderName))
+
+                        if(is_deletable_folder())
                         {
-                            Utility.dispToast(mContext, "App folder can't be deleted");
-                            return true ;
+                            alertDialogHelper.showAlertDialog("", "Delete folder"+" ("+msgDeleteFile+")", "DELETE", "CANCEL", 1, true);
                         }
-                        alertDialogHelper.showAlertDialog("", "Delete folder"+" ("+msgDeleteFile+")", "DELETE", "CANCEL", 1, true);
+
+
                     }
+
                     return true;
 
 
@@ -184,6 +190,37 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
 
                     return false;
             }
+        }
+        private boolean is_deletable_folder()
+        {
+            boolean status=false;
+
+            for(int i=0;i<multiselect_list.size();i++) {
+                 String[] pathSplit=multiselect_list.get(i).getFolderPath().split("/");
+                 String folderName = pathSplit[pathSplit.length-1];
+                 System.out.print(""+folderName);
+                 String msg=" can't be deleted";
+                if (multiselect_list.get(i).getFolderPath().contains(Constants.allFilesFolder)) {
+                    Utility.dispToast(mContext, folderName + msg);
+                    return false;
+                } else if (multiselect_list.get(i).getFolderPath().contains(Constants.pdfFolderName)) {
+                    Utility.dispToast(mContext, folderName+ msg);
+                    return false;
+                } else if (multiselect_list.get(i).getFolderPath().contains(Constants.imageFolderName)) {
+                    Utility.dispToast(mContext, folderName + msg);
+                    return false;
+                } else if (multiselect_list.get(i).getFolderPath().contains(Constants.hiddenFilesFolder)) {
+                    Utility.dispToast(mContext, folderName +msg);
+                    return false;
+                }
+                else
+                {
+                    status=true;
+                }
+
+            }
+
+            return status;
         }
 
         @Override
@@ -407,14 +444,38 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
     }
 
     @Override
-    public void onFolderSelected(folder_Model contact) {
+    public void onFolderSelected(folder_Model folderData) {
 
 
+        this.folderData=folderData;
         //Utility.dispToast(mContext,contact.getFolderPath() );
 
-        Intent intent=new Intent(getActivity(), Activity_File_List.class);
-        intent.putExtra(Constants.folderPath, contact.getFolderPath());
-        startActivity(intent);
+
+        if(folderData.getFolderPath().contains(Constants.hiddenFilesFolder))
+        {
+            if(Utility.isManualPasswordSet())
+            {
+
+                new EncryptDialogUtility(instance).fileEncryptPasswordDialog(mContext);
+            }
+            else
+            {
+
+                Intent intent = new Intent(getActivity(), LockerPasswordActivity.class);
+                startActivity(intent);
+
+            }
+        }
+        else {
+            Intent intent = new Intent(getActivity(), Activity_File_List.class);
+            intent.putExtra(Constants.folderPath, folderData.getFolderPath());
+            startActivity(intent);
+        }
+
+
+
+
+
     }
 
     @Override
@@ -461,5 +522,28 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
     }
 
 
+    @Override
+    public void onCancelClick() {
 
+    }
+
+    @Override
+    public int onEncryptClick(String password) {
+        String s  =  Utility.readPasswordFile();
+        //Utility.dispToast(ctx,""+s.toString());
+        if(s.equals(password))
+        {
+            if(folderData!=null) {
+                Intent intent = new Intent(getActivity(), Activity_File_List.class);
+                intent.putExtra(Constants.folderPath, folderData.getFolderPath());
+                startActivity(intent);
+                return 1;
+            }
+            return 0;
+        }
+        else {
+            Utility.dispToast(mContext,getResources().getString(R.string.passwordnotmatch));
+            return  0;
+        }
+    }
 }

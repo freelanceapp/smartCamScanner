@@ -23,7 +23,7 @@
     <color name="gradation_04_light">#ffe0e0e0</color>
     <color name="gradation_05_light">#ffbdbdbd</color>
     <color name="gradation_03_dark">#ffeeeeee</color>
-
+<color name="lockpswd_bgrnd">#f1716e</color>
     <color name="onePlusAccentColor_device_default_dark">@color/system_default_blue_300</color>
     <color name="grey">@color/grey_light</color>
     <color name="gradation_05">@color/gradation_05_light</color>

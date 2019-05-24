@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -127,6 +129,28 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
     }
 
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(Constants.isFromORderActivity)
+        { Constants.isFromORderActivity=false;
+
+           setUpCropImageView();
+            mImages.clear();
+            mImages = Activity_Reorder.stringArrayListModified;
+            for (int i = 0; i < mImages.size(); i++)
+                mCroppedImageUris.put(i, Uri.fromFile(new File(mImages.get(i))));
+
+            mFinishedclicked = false;
+
+
+            setImage(0);
+        }
+
+
+    }
+
     public void cropButtonClicked() {
         mCurrentImageEdited = false;
         String root = Environment.getExternalStorageDirectory().toString();
@@ -139,6 +163,7 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
 
             Utility.dispToast(mContext,getResources().getString(R.string.error_occurred ));
             return;
+
         }
 
         String path = uri.getPath();
@@ -205,6 +230,13 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
                 mCurrentImageEdited = false;
                 nextImageClicked();
                 return true;
+
+            case R.id.action_reorder:
+                Intent intent = new Intent(CropImageActivity.this,Activity_Reorder.class);
+                intent.putExtra(Constants.reoderData, mCroppedImageUris);
+                startActivity(intent);
+
+                return  true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -419,7 +451,7 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onFolderSelected(folder_Model contact) {
 
-        Utility.dispToast(mContext,contact.getFolderPath());
+       // Utility.dispToast(mContext,contact.getFolderPath());
 
         if(dialog!=null)
         {
@@ -524,7 +556,6 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
                 if(Utility.isWhitespace(folderName_Edit.getText().toString()))
                 {
                     folderName_Edit.setError(mContext.getResources().getString(R.string.namerequired));
-
                     return;
                 }
 
@@ -561,6 +592,30 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
     protected void onDestroy() {
         super.onDestroy();
 
+        deleteJunkFiles();
+    }
+
+
+    private void deleteJunkFiles()
+    {
+        try {
+            File directory = new File(Constants.pdfFolderName);
+            // Get all files from a directory.
+            File[] fList = directory.listFiles();
+            System.out.print("" + fList);
+
+            for (File file : fList) {
+                if (file.isFile()) {
+                    if (file.getAbsolutePath().contains("cropped") && file.exists()) {
+                        Log.d("fileName-->>", "" + file.getAbsolutePath());
+                        file.delete();
+                    }
+                }
+            }
+        }catch (Exception e)
+        {
+
+        }
 
     }
 

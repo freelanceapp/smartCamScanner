@@ -15,6 +15,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,7 +30,9 @@ import android.widget.Toast;
 import com.mojodigi.smartcamscanner.Adapter.MultiSelectAdapter_Recent;
 import com.mojodigi.smartcamscanner.AsyncTasks.AsynctaskUtility;
 import com.mojodigi.smartcamscanner.AsyncTasks.deleteFileAsyncTask;
+import com.mojodigi.smartcamscanner.AsyncTasks.encryptAsyncTask;
 import com.mojodigi.smartcamscanner.Constants.Constants;
+import com.mojodigi.smartcamscanner.LockerPasswordActivity;
 import com.mojodigi.smartcamscanner.Model.fileModel;
 import com.mojodigi.smartcamscanner.Model.pdfModel;
 import com.mojodigi.smartcamscanner.PDFViewActivity;
@@ -43,7 +46,7 @@ import java.io.File;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
 
-public class RecentFragment extends Fragment  implements MultiSelectAdapter_Recent.recentListener ,AsynctaskUtility.AsyncResponse, AlertDialogHelper.AlertDialogListener ,deleteFileAsyncTask.deleteListener,renameUtility.reNameListener {
+public class RecentFragment extends Fragment  implements MultiSelectAdapter_Recent.recentListener ,AsynctaskUtility.AsyncResponse, AlertDialogHelper.AlertDialogListener ,deleteFileAsyncTask.deleteListener,renameUtility.reNameListener ,encryptAsyncTask.EncryptListener{
 
 
 
@@ -156,14 +159,6 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
 
-                case R.id.action_move:
-                    Utility.dispToast(mContext,"Move");
-                    return true;
-                case R.id.action_encrypt:
-                    Utility.dispToast(mContext,"encrypt");
-                    return true;
-
-
                 case R.id.action_rename:
                     if(multiselect_list.size()==1) {
                         renameUtility obj=new renameUtility();
@@ -200,6 +195,44 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
                     return true;
                 default:
                     return false;
+
+
+
+                case R.id.action_private:
+
+                    if(Utility.isManualPasswordSet()) {
+                        if (multiselect_list.size() >= 1) {
+
+
+                            if (Utility.createOrFindAppDirectory())
+                            {
+                                File[] f = new File[multiselect_list.size()];
+                                for (int i = 0; i < multiselect_list.size(); i++) {
+                                    File file = new File(multiselect_list.get(i).getFilePath());
+                                    f[i] = file;
+                                }
+                                if (f.length >= 1)
+                                    new encryptAsyncTask(mContext, f, Constants.encryptionPassword,instance).execute();
+                                else
+                                    Utility.dispToast(mContext, getResources().getString(R.string.filenotfound));
+                            }
+
+                            else
+                            {
+                                Utility.dispToast(mContext,getResources().getString(R.string.directorynotfound));
+                            }
+
+
+
+                        }
+                    }
+                    else {
+                        Intent i = new Intent(mContext, LockerPasswordActivity.class);
+                        startActivity(i);
+                    }
+
+
+                    return true;
             }
         }
 
@@ -390,7 +423,32 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
     public void onResume() {
         super.onResume();
         finishActionMode();
+        deleteJunkFiles();
         new AsynctaskUtility<fileModel>(mContext,this,Constants.REQUST_RECENT_FILE).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+           private void deleteJunkFiles()
+        {
+            try {
+                File directory = new File(Constants.pdfFolderName);
+                // Get all files from a directory.
+                File[] fList = directory.listFiles();
+                System.out.print("" + fList);
+
+                for (File file : fList) {
+                    if (file.isFile()) {
+                        if (file.getAbsolutePath().contains("cropped") && file.exists()) {
+                            Log.d("fileName-->>", "" + file.getAbsolutePath());
+                            file.delete();
+                        }
+                    }
+                }
+            }catch (Exception e)
+            {
+
+            }
+
+
     }
 
 
@@ -413,7 +471,7 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
         else {
 
             String fpath=new File(recentFile.getFilePath().toString()).getAbsolutePath();
-            Utility.dispToast(mContext, fpath);
+           // Utility.dispToast(mContext, fpath);
             Intent intent=new Intent(mContext,PDFViewActivity.class);
             intent.putExtra(Constants.IntentfilePath, fpath);
             startActivity(intent);
@@ -512,5 +570,21 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
 
         Utility.dispToast(mContext, "Error while renaming file ");
 
+    }
+
+    @Override
+    public void onEncryptSuccessful() {
+        // remove  the  file from the lsit  and refresh the adapte and finish  action mode;
+        if(multiselect_list.size()>0)
+        {
+            for(int i=0;i<multiselect_list.size();i++)
+            {
+                recent_ImgList.remove(multiselect_list.get(i));
+            }
+        }
+        multiselect_list.clear();
+        multiSelectAdapter.notifyDataSetChanged();
+        if(mActionMode !=null)
+            mActionMode.finish();
     }
 }

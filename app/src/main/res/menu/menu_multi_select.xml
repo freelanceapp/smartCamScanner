@@ -12,24 +12,14 @@
         android:title="@string/menu_item_delete"
         app:showAsAction="always"/>
 
-
-
-
-    <item  android:id="@+id/action_move"
-        android:visible="false"
-        android:title="@string/menu_item_move"/>
-
-
     <item  android:id="@+id/action_Share"
         android:title="Share"/>
 
     <item  android:id="@+id/action_rename"
         android:title="Rename"/>
 
-    <item  android:id="@+id/action_encrypt"
-        android:visible="false"
-        android:title="Encrypt"/>
-
+    <item  android:id="@+id/action_private"
+        android:title="Hide"/>
 
 
     <item  android:id="@+id/action_details"

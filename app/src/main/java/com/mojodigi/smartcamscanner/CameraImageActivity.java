@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -19,16 +20,19 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.AndroidException;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 
 import com.mojodigi.smartcamscanner.AsyncTasks.createFileAsyncTask;
 import com.mojodigi.smartcamscanner.Constants.Constants;
@@ -47,12 +51,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Objects;
 
 public class CameraImageActivity extends AppCompatActivity implements createFileAsyncTask.AsyncResponse , ThumbnailCallback {
 
     private Context mContext;
     private Toolbar toolbar;
     private ImageView scannedImage;
+
 
     private int REQUEST_CODE_SCAN=100;
 
@@ -66,10 +72,37 @@ public class CameraImageActivity extends AppCompatActivity implements createFile
     private RecyclerView thumbListView;
 
     static {
+
         System.loadLibrary("NativeImageProcessor");
 
     }
 
+
+    //pinch
+    private ScaleGestureDetector mScaleGestureDetector;
+    private float mScaleFactor = 1.0f;
+
+    //pinch
+
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        mScaleGestureDetector.onTouchEvent(event);
+        return true;
+    }
+    //pinch
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector scaleGestureDetector){
+            mScaleFactor *= scaleGestureDetector.getScaleFactor();
+            mScaleFactor = Math.max(0.1f,
+                    Math.min(mScaleFactor, 10.0f));
+            scannedImage.setScaleX(mScaleFactor);
+            scannedImage.setScaleY(mScaleFactor);
+            return true;
+        }
+    }
+    //pinch
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +135,9 @@ public class CameraImageActivity extends AppCompatActivity implements createFile
 
         thumbListView = (RecyclerView) findViewById(R.id.thumbnails);
         scannedImage=findViewById(R.id.scannedImage);
+  //pinch
+        mScaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
+ //pinch
         fileNameEditText=findViewById(R.id.fileNameEditText);
 
         fileNameEditText.setOnTouchListener(new View.OnTouchListener() {
@@ -118,6 +154,7 @@ public class CameraImageActivity extends AppCompatActivity implements createFile
 
         if(imageBitmap!=null)
             scannedImage.setImageBitmap(imageBitmap);
+            //scannedImage.setImage(ImageSource.bitmap(imageBitmap));
         initHorizontalList();
     }
 
@@ -144,7 +181,7 @@ public class CameraImageActivity extends AppCompatActivity implements createFile
         Handler handler = new Handler();
         Runnable r = new Runnable() {
             public void run() {
-                //Bitmap thumbImage = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.photo), 640, 640, false);
+
                 Bitmap thumbImage = Bitmap.createScaledBitmap(imageBitmap, 640, 640, false);
                 //Bitmap thumbImage =imageBitmap;
                 imageBitmapTosave = imageBitmap;
@@ -218,6 +255,7 @@ public class CameraImageActivity extends AppCompatActivity implements createFile
                 matrix.setRotate(degrees);
                 bOutput = Bitmap.createBitmap(bInput, 0, 0, bInput.getWidth(), bInput.getHeight(), matrix, true);
                 scannedImage.setImageBitmap(bOutput);
+                //scannedImage.setImage(ImageSource.bitmap(bOutput));
                 imageBitmap=bOutput;    //new  line
                 bindDataToAdapter();  //new line
                 break;
@@ -226,6 +264,7 @@ public class CameraImageActivity extends AppCompatActivity implements createFile
             case R.id.action_crop:
                 if(imageBitmap!=null)
                 cropImageUri(getImageUri(mContext, imageBitmap));
+
                 break;
 
             case  R.id.action_save:
@@ -370,9 +409,9 @@ public class CameraImageActivity extends AppCompatActivity implements createFile
     @Override
     public void onThumbnailClick(Filter filter) {
 
-        // scannedImage.setImageBitmap(filter.processFilter(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.photo), 640, 640, false)));
-        //scannedImage.setImageBitmap(filter.processFilter(imageBitmap));
+
         scannedImage.setImageBitmap(filter.processFilter(Bitmap.createScaledBitmap(imageBitmap, 640,640 ,false )));
+        //scannedImage.setImage(ImageSource.bitmap(filter.processFilter(Bitmap.createScaledBitmap(imageBitmap, 640,640 ,false ))));
         imageBitmapTosave=filter.processFilter(Bitmap.createScaledBitmap(imageBitmap, 640,640 ,false ));
 
     }
@@ -382,7 +421,8 @@ public class CameraImageActivity extends AppCompatActivity implements createFile
 
     protected void cropImageUri(Uri picUri) {
         try {
-            Intent intent = new Intent("com.android.camera.action.CROP");
+            Intent intent = new Intent("com.android.camera.action.CROP",android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
             intent.setDataAndType(picUri, "image/*");
 
             intent.putExtra("crop", "true");
@@ -422,27 +462,46 @@ public class CameraImageActivity extends AppCompatActivity implements createFile
                 if (resultCode == RESULT_OK && null != data) {
                     Bitmap mBitmap = null;
 
-                    Uri selectedImageUri = data.getData();
-                    try {
-                        mBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    Uri selectedImageUri = data.getData();    //here
+
+                    if(selectedImageUri==null ) {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                            mBitmap = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
+                        } else {
+                            mBitmap = (Bitmap) data.getExtras().get("data");
+                        }
+                    }
+                    else if(selectedImageUri !=null && Build.VERSION.SDK_INT == Build.VERSION_CODES.N)
+                    {
+                        mBitmap = (Bitmap) data.getExtras().get("data");
+                    }
+                    else {
+
+                        try {
+                            mBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     Matrix mat = new Matrix();
                     if (mBitmap != null) {
                         Bitmap mCropedBitmap = Bitmap.createBitmap(mBitmap, 0, 0,
                                 mBitmap.getWidth(), mBitmap.getHeight(), mat, true);
-                        imageBitmap =mCropedBitmap;
+                        imageBitmap = mCropedBitmap;
                         scannedImage.setImageBitmap(imageBitmap);
 
-                      bindDataToAdapter();
+
+                        bindDataToAdapter();
+
 
                     }
+                    break;
+
+
                 }
-                break;
-
-
         }
     }
 

@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.support.annotation.ColorInt;
@@ -38,14 +39,32 @@ import com.mojodigi.smartcamscanner.Model.fileModel;
 import com.mojodigi.smartcamscanner.R;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Random;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
 
 import static java.util.Calendar.getInstance;
 
@@ -526,7 +545,237 @@ public class Utility {
     }
 
 
+    public static boolean isManualPasswordSet()
+    {
+        // boolean status=false;
+        try {
+            String path = Environment.getExternalStorageDirectory() + "/" + Constants.passDir+"/"+Constants.passwordFileDes;
+            File f = new File(path);
+            return f.exists();
+        }catch (Exception e)
+        {
+            return  false;
+        }
 
+    }
+
+    public static boolean createOrFindAppDirectory()
+    {
+        boolean status = false;
+
+        if(checkOrCreateParentDirectory())
+        {
+
+            //String path  = Environment.getExternalStorageDirectory() + "/" + Constants.privateFiles;
+            String path  =   Constants.hiddenFilesFolder;
+
+
+            File f = new File(path);
+            if (!f.exists()) {
+                if (f.mkdir())
+                    status = true;
+                else
+                    status = false;
+            }
+            else
+                status = true;
+
+
+        }
+        return  status;
+
+    }
+
+    public static String getEncryptFileName(String filePath)
+    {
+
+        filePath =  Constants.hiddenFilesFolder +"/" + new File(filePath).getName() + ".des";
+        return  filePath;
+    }
+
+    public static String setDecryptFilePath()
+    {
+
+        return  Constants.hiddenFilesFolder+"/";
+    }
+
+    public static  int  createPasswordFile(Context ctx,String userPassword) {
+        try {
+
+            String path = Environment.getExternalStorageDirectory() + "/" + Constants.passDir;
+
+            File f = new File(path);
+            if (!f.exists()) {
+                if (f.mkdir()) {
+                    String cPath=path+"/"+Constants.passwordFile;
+                    String data = userPassword;
+                    FileOutputStream out = new FileOutputStream(cPath);
+                    out.write(data.getBytes());
+                    out.close();
+                    File file=new File(cPath);
+
+                    if (file.exists())
+                    {
+                        try {
+                            FileInputStream inFile = new FileInputStream(file);
+                            FileOutputStream outFile = new FileOutputStream(path+"/"+Constants.passwordFileDes);
+
+                            String password = Constants.encryptionPassword;
+                            PBEKeySpec pbeKeySpec = new PBEKeySpec(password.toCharArray());
+                            // SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndTripleDES");  //in java
+                            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC");  //in android
+                            SecretKey secretKey = secretKeyFactory.generateSecret(pbeKeySpec);
+
+
+
+
+                            byte[] salt = new byte[8];
+                            Random random = new Random();
+                            random.nextBytes(salt);
+
+                            PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, 100);
+                            //Cipher cipher = Cipher.getInstance("PBEWithMD5AndTripleDES");  //in java
+                            Cipher cipher = Cipher.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC");  // in android
+                            cipher.init(Cipher.ENCRYPT_MODE, secretKey, pbeParameterSpec);
+                            outFile.write(salt);
+
+                            byte[] input = new byte[64];
+                            int bytesRead;
+                            while ((bytesRead = inFile.read(input)) != -1) {
+                                byte[] output = cipher.update(input, 0, bytesRead);
+                                if (output != null)
+                                    outFile.write(output);
+                            }
+
+                            byte[] output = cipher.doFinal();
+                            if (output != null)
+                                outFile.write(output);
+
+                            inFile.close();
+                            outFile.flush();
+                            outFile.close();
+
+                            // delete  the  temporary file;
+                            if(file.exists()) {
+                                file.delete();
+                                Utility.RunMediaScan(ctx,file);
+                            }
+
+                        }
+                        catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (InvalidKeySpecException e) {
+                            e.printStackTrace();
+                        } catch (NoSuchAlgorithmException e) {
+                            e.printStackTrace();
+                        } catch (BadPaddingException e) {
+                            e.printStackTrace();
+                        } catch (InvalidKeyException e) {
+                            e.printStackTrace();
+                        } catch (InvalidAlgorithmParameterException e) {
+                            e.printStackTrace();
+                        } catch (NoSuchPaddingException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (IllegalBlockSizeException e) {
+                            e.printStackTrace();
+                        }
+
+                        return 1;
+
+                    }
+
+
+                } else {
+
+                    Utility.dispToast(ctx, ctx.getResources().getString(R.string.filenotcreated)); // remove this message
+                    return 0;
+                }
+            } else {
+                Utility.dispToast(ctx, ctx.getResources().getString(R.string.password_create_error));
+                return 0;
+            }
+        }
+        catch (Exception e)
+        {
+            return  0;
+        }
+        return  0;
+    }
+
+
+    public static  String readPasswordFile()
+    {
+        String path = Environment.getExternalStorageDirectory() + "/" + Constants.passDir+"/"+Constants.passwordFileDes;
+        try {
+            String password = Constants.encryptionPassword;
+            PBEKeySpec pbeKeySpec = new PBEKeySpec(password.toCharArray());
+            // SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndTripleDES");  //in java
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC");  //in android
+            SecretKey secretKey = secretKeyFactory.generateSecret(pbeKeySpec);
+            File inputFile=new File(path);
+            if(inputFile.exists())
+            {
+                FileInputStream fis = new FileInputStream(inputFile);
+
+                byte[] salt = new byte[8];
+                fis.read(salt);
+
+                PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, 100);
+
+                //Cipher cipher = Cipher.getInstance("PBEWithMD5AndTripleDES");  //in java
+                Cipher cipher = Cipher.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC");  // in android
+                cipher.init(Cipher.DECRYPT_MODE, secretKey, pbeParameterSpec);
+
+                //FileOutputStream fos = new FileOutputStream(outputFile);
+                // FileOutputStream fos = new FileOutputStream("G:\\EncryptTest\\image\\Takendra_decrypted.jpg");
+                byte[] in = new byte[64];
+                int read;
+                while ((read = fis.read(in)) != -1) {
+                    byte[] output = cipher.update(in, 0, read);
+                    // if (output != null)
+                    // fos.write(output);
+                }
+
+                byte[] output = cipher.doFinal();
+                if (output != null) {
+                    // fos.write(output);
+                    String s = new String(output);
+                    return s;
+                }
+
+                fis.close();
+                // fos.flush();
+                //fos.close();
+                // Utility.RunMediaScan(ctx,outputFile);
+            }
+
+        }catch (InvalidKeyException e)
+        {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+
+
+
+        return  "";
+    }
 
 
 

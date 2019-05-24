@@ -34,6 +34,7 @@
     <string name="save_current">Save</string>
     <string name="save_countinue">Save &amp; Countinue</string>
     <string name="done">Done</string>
+    <string name="savetxt">Save</string>
     <string name="skip_text">Skip</string>
     <string name="error_occurred">Error Occurred</string>
     <string name="save_first">Save Current Image First</string>
@@ -62,6 +63,21 @@
     <string name="image_count"> 1 of 2</string>
     <string name="nextimage_contentdesc">Next Image</string>
 
+    <string name="directorynotfound">Could not find the directory"</string>
+    <string name="filenotfound">Cound not get the file to hide</string>
+    <string name="encmsg">Wait...</string>
+    <string name="decmsg">Preparing files...</string>
+    <string name="password_hint">Write password</string>
+    <string name="cpassword_hint">Confirm password</string>
+    <string name="setpassword">Set password</string>
+    <string name="filenotcreated">file  not created</string>
+    <string name="passwordnotmatch">Password does not match</string>
+    <string name="type_password">type a password</string>
+    <string name="Incrct_pswd">Incorrect password</string>
+    <string name="encrypt_heading">Locked files</string>
+    <string name="password">write password</string>
+    <string name="unlocktxt">Unlock</string>
+    <string name="password_create_error">can\'t create password</string>
 
     <string-array name="array_page_sizes_a0_b10" translatable="false">
         <item>A0 (2384 x 3370)</item>

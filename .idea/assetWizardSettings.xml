@@ -66,7 +66,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/social/ic_plus_one_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/content/ic_save_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -78,9 +78,9 @@
                           <map>
                             <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_qr_code" />
+                            <entry key="outputName" value="ic_fcm_icon" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="G:\ICONS\SmartCamScanner\Icons\Smart Scanner\qr-code.svg" />
+                            <entry key="sourceFile" value="G:\ICONS\SmartCamScanner\notification icon\scanner.svg" />
                           </map>
                         </option>
                       </PersistentState>

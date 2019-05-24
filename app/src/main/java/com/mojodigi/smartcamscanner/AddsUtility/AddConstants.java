@@ -16,7 +16,9 @@ public class AddConstants
     public static  String NEWSURL="NewsUrl";
     public static final String WEB_URL="WebUrl";
     public static final String CLICK_PUSH_NOTIFICATION="ClickPushNotification";
-    public static final String API_PUSH_NOTIFICATION = "http://development.bdigimedia.com/riccha_dev/video_player/pushNotifications/setFcmToken.php";
+
+
+    public static final String API_PUSH_NOTIFICATION = "http://onetracky.com/Apps/smart-scan/pushNotifications/setFcmToken.php";
 
 
     public static final String API_RESPONSE_CODE="apiResponseCode";
@@ -26,7 +28,7 @@ public class AddConstants
 
 
 
-
+    public static final String isFcmRegistered="fcm";
 
 
 
@@ -130,6 +132,23 @@ public class AddConstants
         return object;
     }
 
+    public static JSONObject prepareFcmJsonRequest(Context mContext, String deviceID , String nameOfDevice , String fcm_Token , String appVersion)
+    {
+        JSONObject object  =  new JSONObject();
+        try {
+            object.put("deviceId", deviceID);
+            object.put("deviceName", nameOfDevice);
+            object.put("fcmToken", fcm_Token);
+            object.put("appVer", appVersion);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d("Json request", object.toString());
+        return object;
+    }
+
+
 
     public static boolean checkIsOnline(Context mContext)
     {
@@ -155,19 +174,7 @@ public class AddConstants
 
 
 
-    public static JSONObject prepareFcmJsonRequest(Context mContext, String deviceID , String nameOfDevice , String fcm_Token , String appVersion)
-    {
-        JSONObject object  =  new JSONObject();
-        try {
-            object.put("deviceId", deviceID);
-            object.put("deviceName", nameOfDevice);
-            object.put("fcmToken", fcm_Token);
-            object.put("appVer", appVersion);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return object;
-    }
+
 
 
 

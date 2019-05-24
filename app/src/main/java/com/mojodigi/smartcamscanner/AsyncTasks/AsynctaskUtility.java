@@ -213,12 +213,17 @@ public class AsynctaskUtility<T> extends AsyncTask<Void, Void, ArrayList<T>> {
                         model.setFileModifiedDate(Utility.LongToDate((file.lastModified())));
                         model.setFilePath(file.getPath());
                         model.setDateToSort(file.lastModified());
-                        if(file.getAbsolutePath().endsWith("jpg"))
-                        model.setIsImgs(true);
-                        else
-                            model.setIsImgs(false);
 
-                        recentList.add(model);
+                        if(!file.getAbsolutePath().endsWith(".des")) {
+                            if (file.getAbsolutePath().endsWith("jpg"))
+                                model.setIsImgs(true);
+                            else
+                                model.setIsImgs(false);
+
+
+                            recentList.add(model);
+                        }
+
 
                     } else if (file.isDirectory()) {
                         listRecentFiles(file.getAbsolutePath());
