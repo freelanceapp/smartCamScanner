@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         askForPermission();
 
-        getSupportActionBar().setTitle("Home");
+        getSupportActionBar().setTitle(Utility.getString(mContext, R.string.home));
 
         //init pdf vars
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -394,9 +394,9 @@ public class MainActivity extends AppCompatActivity
                 //Previously Permission Request was cancelled with 'Dont Ask Again',
                 // Redirect to Settings after showing Information about why you need the permission
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setTitle("Need Permissions");
-                builder.setMessage(mContext.getString(R.string.app_name) + " app need stoarge permission.");
-                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+                builder.setTitle(Utility.getString(mContext, R.string.need_permission));
+                builder.setMessage(mContext.getString(R.string.app_name) + Utility.getString(mContext, R.string.permission_required));
+                builder.setPositiveButton(Utility.getString(mContext, R.string.grant), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
@@ -405,10 +405,11 @@ public class MainActivity extends AppCompatActivity
                         Uri uri = Uri.fromParts("package", mContext.getPackageName(), null);
                         intent.setData(uri);
                         startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
-                        Toast.makeText(mContext, "Go to Permissions to Grant storage access", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(mContext, "Go to Permissions to Grant storage access", Toast.LENGTH_LONG).show();
+                        Utility.dispToast(mContext, R.string.gotopermissions);
                     }
                 });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(Utility.getString(mContext, R.string.cancel_txt), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
@@ -451,16 +452,16 @@ public class MainActivity extends AppCompatActivity
             } else if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext, permissionsRequired[0]) || ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext, permissionsRequired[1]) || ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext, permissionsRequired[2])) {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setTitle("Need Permissions");
-                builder.setMessage(mContext.getString(R.string.app_name) + " app needs storage permission.");
-                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+                builder.setTitle(Utility.getString(mContext, R.string.need_permission));
+                builder.setMessage(mContext.getString(R.string.app_name) + Utility.getString(mContext, R.string.permission_required));
+                builder.setPositiveButton(Utility.getString(mContext, R.string.grant), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                         ActivityCompat.requestPermissions((Activity) mContext,permissionsRequired, PERMISSION_CALLBACK_CONSTANT);
                     }
                 });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(Utility.getString(mContext, R.string.cancel_txt), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
@@ -468,7 +469,8 @@ public class MainActivity extends AppCompatActivity
                 });
                 builder.show();
             } else {
-                Toast.makeText(mContext, "Unable to get Permission", Toast.LENGTH_LONG).show();
+                //Toast.makeText(mContext, , Toast.LENGTH_LONG).show();
+                Utility.dispToast(mContext, R.string.unable_to_get_permission);
             }
         }
     }
@@ -486,8 +488,8 @@ public class MainActivity extends AppCompatActivity
         qrScan = new IntentIntegrator(this);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("Recent"));
-        tabLayout.addTab(tabLayout.newTab().setText("All Folders"));
+        tabLayout.addTab(tabLayout.newTab().setText(Utility.getString(mContext, R.string.recent)));
+        tabLayout.addTab(tabLayout.newTab().setText(Utility.getString(mContext, R.string.allfolder)));
 
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
@@ -552,7 +554,8 @@ public class MainActivity extends AppCompatActivity
             Log.e("App Version Name : ",""+appVersionName);
 
             if(appVersionName!=null) {
-                String appVersion = "App Version : " + appVersionName;
+                //String appVersion = "App Version : " + appVersionName;
+                String appVersion = Utility.getString(mContext, R.string.appversion)+" : " + appVersionName;
                 setNavAppVersion(appVersion);
             }
 
@@ -657,7 +660,8 @@ public class MainActivity extends AppCompatActivity
                 intent.putExtra("BITMAP_PICK_CAMERA", bitmapToShare);
                 startActivity(intent);
             } else {
-                Utility.dispToast(mContext, "Please scan again");
+               // Utility.dispToast(mContext, "Please scan again");
+                Utility.dispToast(mContext, R.string.scan_again);
             }
 
 
@@ -699,7 +703,8 @@ public class MainActivity extends AppCompatActivity
             String readData="";
             //if qrcode has nothing in it
             if (result.getContents() == null) {
-                Toast.makeText(this, "Result Not Found", Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, "Result Not Found", Toast.LENGTH_LONG).show();
+                Utility.dispToast(mContext, R.string.resultnotfound);
             } else {
                 //if qr contains data
                 try {

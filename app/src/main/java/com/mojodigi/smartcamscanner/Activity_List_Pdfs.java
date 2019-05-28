@@ -70,7 +70,7 @@ public class Activity_List_Pdfs extends AppCompatActivity implements AsynctaskUt
         instance=this;
         mContext=Activity_List_Pdfs.this;
 
-        Utility.setActivityTitle(mContext,"Pdf files" );
+        Utility.setActivityTitle(mContext,"Pdf "+Utility.getString(mContext, R.string.files) );
 
         empty_view=findViewById(R.id.empty_view);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -291,7 +291,7 @@ public class Activity_List_Pdfs extends AppCompatActivity implements AsynctaskUt
                     if (selected_pdfList.size() >= 1) {
                         int mFileCount = selected_pdfList.size();
                         String msgDeleteFile = mFileCount > 1 ? mFileCount + " " + getResources().getString(R.string.delfiles) : mFileCount + " " + getResources().getString(R.string.delfiles);
-                        alertDialogHelper.showAlertDialog("", "Delete file" + " (" + msgDeleteFile + ")", "DELETE", "CANCEL", 1, true);
+                        alertDialogHelper.showAlertDialog("", Utility.getString(mContext, R.string.delete_file) + " (" + msgDeleteFile + ")", Utility.getString(mContext, R.string.menu_item_delete), Utility.getString(mContext, R.string.cancel_txt), 1, true);
                     }
 
                     return true;

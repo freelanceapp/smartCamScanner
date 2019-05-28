@@ -22,7 +22,7 @@
               <EditText
                   android:layout_marginTop="@dimen/dp40"
                   android:layout_marginBottom="@dimen/dp40"
-                  android:text="Rename"
+                  android:text="@string/rename"
                   android:id="@+id/Edit_Rename"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content" />
@@ -44,7 +44,7 @@
            <TextView
                android:layout_below="@+id/Edit_Rename"
                android:id="@+id/View_cancel"
-               android:text="@string/cancel"
+               android:text="@string/cancel_txt"
                android:textSize="@dimen/sp16"
                android:padding="@dimen/dp10"
                android:textColor="@color/colorAccent"

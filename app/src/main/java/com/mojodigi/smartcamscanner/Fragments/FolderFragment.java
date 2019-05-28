@@ -151,7 +151,7 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
 
                         if(is_deletable_folder())
                         {
-                            alertDialogHelper.showAlertDialog("", "Delete folder"+" ("+msgDeleteFile+")", "DELETE", "CANCEL", 1, true);
+                            alertDialogHelper.showAlertDialog("", Utility.getString(mContext, R.string.delete_folder)+" ("+msgDeleteFile+")", Utility.getString(mContext, R.string.menu_item_delete), Utility.getString(mContext, R.string.cancel_txt), 1, true);
                         }
 
 
@@ -199,7 +199,7 @@ public class FolderFragment extends Fragment implements getFolderAsyncTask.folde
                  String[] pathSplit=multiselect_list.get(i).getFolderPath().split("/");
                  String folderName = pathSplit[pathSplit.length-1];
                  System.out.print(""+folderName);
-                 String msg=" can't be deleted";
+                 String msg= " "+Utility.getString(mContext,R.string.can_not_delete);
                 if (multiselect_list.get(i).getFolderPath().contains(Constants.allFilesFolder)) {
                     Utility.dispToast(mContext, folderName + msg);
                     return false;

@@ -70,7 +70,7 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
         instance = this;
 
 
-        Utility.setActivityTitle(mContext, "Scanned file");
+        Utility.setActivityTitle(mContext, Utility.getString(mContext, R.string.scanned));
         if(Constants.imageBitmap!=null) {
             imageBitmap = Constants.imageBitmap;
         }
@@ -191,7 +191,7 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
                 }
                 else
                 {
-                    Utility.dispToast(mContext, "Please scan a file to save");
+                    Utility.dispToast(mContext, R.string.scanfile);
                 }
 
                 break;
@@ -268,7 +268,7 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
                     }
                 }else
                 {
-                    Utility.dispToast(mContext,"file name can't be blank");
+                    Utility.dispToast(mContext,R.string.can_not_blank);
                 }
                 dialog.dismiss();
             }
@@ -295,7 +295,7 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
                     }
                 }
                 else {
-                    Utility.dispToast(mContext,"file name can't be blank");
+                    Utility.dispToast(mContext,R.string.can_not_blank);
                 }
                 dialog.dismiss();
 
@@ -315,13 +315,15 @@ public class ScannedImageActivity extends AppCompatActivity implements createFil
 
     @Override
     public void onSuccess() {
-        Utility.dispToast(mContext, "File created successfully");
+       // Utility.dispToast(mContext, "File created successfully");
+        Utility.dispToast(mContext, R.string.file_success);
         finish();
     }
 
     @Override
     public void onFailure() {
-        Utility.dispToast(mContext, "Error while creating File");
+        //Utility.dispToast(mContext, "Error while creating File");
+        Utility.dispToast(mContext, R.string.fileerror);
         finish();
     }
 

@@ -339,7 +339,7 @@ public class CropImageActivity extends AppCompatActivity implements View.OnClick
             }
         }
         else {
-            Utility.dispToast(mContext,"file path does not exists" );
+            Utility.dispToast(mContext,R.string.pathnotexist );
         }
 
     }

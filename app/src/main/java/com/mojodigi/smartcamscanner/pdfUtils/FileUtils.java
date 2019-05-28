@@ -387,7 +387,7 @@ public class FileUtils {
             mContext.startActivity(intent);
         } catch (ActivityNotFoundException e) {
            ///showSnackbar(mContext, R.string.snackbar_no_pdf_app);
-            Utility.dispToast(mContext, "Pdf app not found");
+            //Utility.dispToast(mContext, "Pdf app not found");
         }
     }
 

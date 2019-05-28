@@ -8,7 +8,7 @@
     android:layout_height="wrap_content">
     <TextView
         android:padding="@dimen/dp10"
-        android:text="Select format"
+        android:text="@string/select_format"
         android:textSize="@dimen/sp22"
         android:textColor="@color/colorAccent"
         android:layout_width="match_parent"
@@ -79,7 +79,7 @@
     <TextView
         android:id="@+id/cancelShare"
         android:padding="@dimen/dp10"
-        android:text="CANCEL"
+        android:text="@string/cancel_txt"
         android:textColor="@color/colorAccent"
         android:textSize="@dimen/sp18"
         android:gravity="right"

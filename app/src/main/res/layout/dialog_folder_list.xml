@@ -11,7 +11,7 @@
     <TextView
         android:id="@+id/headertxt"
         android:padding="@dimen/dp10"
-        android:text="Save to"
+        android:text="@string/saveto"
         android:textSize="@dimen/sp22"
         android:background="@color/colorAccent"
         android:layout_centerInParent="true"

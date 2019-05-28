@@ -27,7 +27,7 @@
                 android:layout_height="45dp"
                 android:background="@color/colorPrimary"
                 android:gravity="center"
-                android:text="New version is available."
+                android:text="@string/newversionavlbl"
                 android:textColor="@color/white"
                 android:textSize="16dp" />
 
@@ -94,7 +94,7 @@
                 android:layout_toRightOf="@+id/image"
                 android:paddingLeft="15dp"
                 android:paddingRight="10dp"
-                android:text="There is new version of this application available, click UPDATE NOW to update."
+                android:text="@string/new_version_txt"
                 android:textColor="#000"
                 android:textSize="13dp" />/>
 
@@ -116,7 +116,7 @@
                     android:layout_marginTop="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Later"
+                    android:text="@string/later"
                     android:textAllCaps="true"
                     android:textColor="@color/colorAccent"
                     android:textSize="12dp"
@@ -133,7 +133,7 @@
                     android:layout_marginTop="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Update  Now "
+                    android:text="@string/update"
                     android:textAllCaps="true"
                     android:textColor="@color/colorAccent"
                     android:textSize="12dp"

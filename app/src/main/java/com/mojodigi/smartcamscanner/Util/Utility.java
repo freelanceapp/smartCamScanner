@@ -126,6 +126,10 @@ public class Utility {
     public static void dispToast(Context ctx, String msg) {
         Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show();
     }
+    public static void dispToast(Context ctx, int resourceId) {
+        Toast.makeText(ctx, ctx.getResources().getString(resourceId), Toast.LENGTH_SHORT).show();
+    }
+
 
     public static String getFileName()
     {
@@ -775,6 +779,18 @@ public class Utility {
 
 
         return  "";
+    }
+
+
+    public  static String getString(Context mContext,int resourceKey)
+    {
+        try {
+            return mContext.getResources().getString(resourceKey);
+        }catch (Exception e)
+        {
+            // in case invalid key  is passed;
+            return "Resource key not found";
+        }
     }
 
 

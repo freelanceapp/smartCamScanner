@@ -40,7 +40,7 @@ public class BarCodeResultActivity extends AppCompatActivity {
             mContext = BarCodeResultActivity.this;
         }
 
-        Utility.setActivityTitle(mContext, "Scan result");
+        Utility.setActivityTitle(mContext, Utility.getString(mContext, R.string.scan_result));
 
         ImageView ok_button=findViewById(R.id.okButton);
         ImageView shareButton=findViewById(R.id.shareButton);

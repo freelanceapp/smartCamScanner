@@ -22,11 +22,11 @@
 
     <item  android:id="@+id/action_Share"
         android:visible="false"
-        android:title="Share"/>
+        android:title="@string/share"/>
 
     <item  android:id="@+id/action_rename"
         android:visible="false"
-        android:title="Rename"/>
+        android:title="@string/rename"/>
 
     <item  android:id="@+id/action_encrypt"
 
@@ -37,7 +37,7 @@
 
     <item  android:id="@+id/action_details"
         android:visible="false"
-        android:title="Details"/>
+        android:title="@string/details"/>
 
 
 </menu>

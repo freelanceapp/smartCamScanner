@@ -5,9 +5,9 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Smart Scanner</string>
-    <!-- <string name="nav_header_subtitle">android.studio@android.com</string>-->
+
     <string name="nav_header_desc">Navigation header</string>
-    <string name="create_folder">Create folder</string>
+
     <string name="action_save">Save</string>
     <string name="msg_file">File is being created..</string>
 
@@ -19,13 +19,13 @@
     <string name="menu_item_delete">Delete</string>
     <string name="menu_item_move">Move</string>
 
-    <string name="file_provider_authority">com.mojodigi.smartcamscanner</string>
+    <string name="file_provider_authority" translatable="false">com.mojodigi.smartcamscanner</string>
     <string name="delfiles">files</string>
     <string name="delfolders">folders</string>
     <string name="delfile">file</string>
     <string name="delfolder">folder</string>
 
-    <string name="filter_file_name">%s_%s.jpg</string>
+    <string name="filter_file_name" translatable="false">%s_%s.jpg</string>
 
     <string name="action_sort">Sort</string>
 
@@ -51,7 +51,7 @@
     <string name="ok_txt">Ok</string>
     <string name="actions_rename">Rename</string>
     <string name="save">SAVE</string>
-    <string name="cancel">Cancel</string>
+
     <string name="namerequired">Name is required</string>
     <string name="emty_error">can not be empty</string>
     <string name="create_txt">Create</string>
@@ -131,16 +131,18 @@
 
     <!--actual add id for FileHunt runningAccount -->
 
-    <string name="admob_app_id">ca-app-pub-7769757158085259~2218192747</string>
-    <string name="banner_add_id">ca-app-pub-7769757158085259/4065874309</string>
-    <string name="ad_unit_id">ca-app-pub-7769757158085259/5753526349</string>
-    <string name="ad_unit_id_reward">ca-app-pub-7769757158085259/5906156319</string>
+    <string name="admob_app_id" translatable="false">ca-app-pub-7769757158085259~2218192747</string>
+    <string name="banner_add_id" translatable="false">ca-app-pub-7769757158085259/4065874309</string>
+    <string name="ad_unit_id" translatable="false">ca-app-pub-7769757158085259/5753526349</string>
+    <string name="ad_unit_id_reward" translatable="false">ca-app-pub-7769757158085259/5906156319</string>
 
     <!--actual add id for FileHunt runningAccount -->
 
 
 
     <string name="document_scann_lib_name" translatable="false">ScanLibrary</string>
+
+
     <string name="finish">Finish</string>
     <string name="crop">Crop</string>
     <string name="rotate">Rotate</string>
@@ -150,4 +152,71 @@
     <string name="mode_none">None</string>
     <string name="mode_black_white">Black &amp; White</string>
     <string name="mode_magic">Magic</string>
+
+
+    <string name="scanfile">Please scan a file to save</string>
+    <string name="can_not_blank">file name can\'t be blank</string>
+
+    <string name="fileerror">Error while creating File</string>
+    <string name="pathnotexist">file path does not exists</string>
+    <string name="no_file_to_share">No files to share</string>
+    <string name="rename_success">rename success</string>
+    <string name="can_not_delete">can\'t be deleted</string>
+    <string name="rename_error">Error while renaming file </string>
+    <string name="gotopermissions">Go to Permissions to Grant storage access</string>
+    <string name="need_permission">Need Permissions</string>
+    <string name="permission_required"> applicartion need stoarge permission.</string>
+    <string name="grant">Grant</string>
+    <string name="unable_to_get_permission">Unable to get Permission</string>
+    <string name="scan_again">Please scan again"</string>
+    <string name="resultnotfound">Result Not Found</string>
+    <string name="foldernotfound">folder does not exist</string>
+    <string name="rename">Rename</string>
+   <string name="filenotexist">File does not exist</string>
+    <string name="details">Details</string>
+    <string name="filecount">Number of files</string>
+<string name="totalsize">Total size</string>
+    <string name="close">Close</string>
+    <string name="saveto">Save to</string>
+    <string name="select_format">Select format</string>
+    <string name="newversionavlbl">New version is available.</string>
+    <string name="new_version_txt">There is new version of this application available, click UPDATE NOW to update.</string>
+    <string name="later">Later</string>
+    <string name="update">Update  Now </string>
+    <string name="name">Name</string>
+    <string name="location">Location</string>
+    <string name="size">Size</string>
+    <string name="orientation">Orientation</string>
+    <string name="resolution">Resolution</string>
+    <string name="date">Date</string>
+
+   <string name="scanned">Scanned file</string>
+    <string name="files">Files</string>
+    <string name="reorder">Reorder</string>
+    <string name="scan_result">Scan result</string>
+    <string name="home">Home</string>
+   <string name="enter_folder_name">Enter folder name</string>
+
+    <!-- menu strings -->
+
+    <string name="importstr">Import</string>
+    <string name="scan">Scan QR/Barcode</string>
+    <string name="share">Share</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="create_folder">Create folder</string>
+    <string name="appversion">App Version</string>
+    <string name="recent">Recent</string>
+    <string name="allfolder">All Folders</string>
+    <string name="hide">Hide</string>
+
+    <string name="delete_folder">Delete folder</string>
+    <string name="delete_file">Delete file</string>
+    <string name="delete_image">Delete Image</string>
+
+
+
+    <!-- menu strings -->
+
+
+
 </resources>

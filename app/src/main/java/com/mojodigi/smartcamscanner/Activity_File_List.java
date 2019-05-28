@@ -78,7 +78,7 @@ public class Activity_File_List  extends AppCompatActivity implements getFolderF
 
         mContext = Activity_File_List.this;
          instance=this;
-        Utility.setActivityTitle(mContext, "Files");
+        Utility.setActivityTitle(mContext, Utility.getString(mContext, R.string.files));
 
         alertDialogHelper = new AlertDialogHelper(mContext, this);
         recyclerView = findViewById(R.id.recycler_view);
@@ -223,7 +223,7 @@ public class Activity_File_List  extends AppCompatActivity implements getFolderF
                     if(multiselect_list.size()>=1) {
                         int mFileCount = multiselect_list.size();
                         String msgDeleteFile = mFileCount > 1 ? mFileCount + " " + getResources().getString(R.string.delfiles) : mFileCount + " " + getResources().getString(R.string.delfile);
-                        alertDialogHelper.showAlertDialog("", "Delete Image"+" ("+msgDeleteFile+")", "DELETE", "CANCEL", 1, true);
+                        alertDialogHelper.showAlertDialog("", Utility.getString(mContext, R.string.delete_image)+" ("+msgDeleteFile+")", Utility.getString(mContext, R.string.menu_item_delete), Utility.getString(mContext, R.string.cancel_txt), 1, true);
                     }
                     return true;
                 case R.id.action_select:

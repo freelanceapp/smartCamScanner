@@ -169,7 +169,7 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
                     if(multiselect_list.size()>=1) {
                         int mFileCount = multiselect_list.size();
                         String msgDeleteFile = mFileCount > 1 ? mFileCount + " " + getResources().getString(R.string.delfiles) : mFileCount + " " + getResources().getString(R.string.delfile);
-                        alertDialogHelper.showAlertDialog("", "Delete file"+" ("+msgDeleteFile+")", "DELETE", "CANCEL", 1, true);
+                        alertDialogHelper.showAlertDialog("", Utility.getString(mContext, R.string.delete_file)+" ("+msgDeleteFile+")", Utility.getString(mContext, R.string.menu_item_delete), Utility.getString(mContext, R.string.cancel_txt), 1, true);
                     }
                     return true;
                 case R.id.action_select:
@@ -398,7 +398,7 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
         }
         else
         {
-            Toast.makeText(mContext, "No files to share", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, R.string.no_file_to_share, Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -552,7 +552,7 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
     @Override
     public void onRenameSuccess() {
 
-        Utility.dispToast(mContext, "rename success");
+        Utility.dispToast(mContext, R.string.rename_success);
         if(mActionMode!=null)
         {
             mActionMode.finish();
@@ -568,7 +568,7 @@ public class RecentFragment extends Fragment  implements MultiSelectAdapter_Rece
             mActionMode.finish();
         }
 
-        Utility.dispToast(mContext, "Error while renaming file ");
+        Utility.dispToast(mContext, R.string.rename_error);
 
     }
 

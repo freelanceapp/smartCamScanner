@@ -8,7 +8,7 @@
 
     <TextView
         android:id="@+id/nodataFound"
-        android:text="File not found"
+        android:text="@string/filenotexist"
         android:textColor="@color/black"
         android:textSize="@dimen/sp20"
         android:visibility="gone"
