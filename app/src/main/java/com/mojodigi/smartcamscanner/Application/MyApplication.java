@@ -37,12 +37,9 @@ public class MyApplication extends android.support.multidex.MultiDexApplication 
 
         //uncomment it for auto tracking while  making live
 
-        //YandexMetrica.enableActivityAutoTracking(this);
-
-
-        /* // Automatic tracking user activity.
         YandexMetrica.enableActivityAutoTracking(this);
-        //App mertrica sdk*/
+
+
 
 
 

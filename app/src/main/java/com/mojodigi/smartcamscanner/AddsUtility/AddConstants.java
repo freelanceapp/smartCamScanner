@@ -51,6 +51,7 @@ public class AddConstants
      //this will contain videoAddId in case of every add providerNetWork;
     public static  final String VIDEO_ADD_ID="videoAddId";
 
+    public static final String AutoStartKey="autostartkey";
 
     public static final String NOT_FOUND="0";
     public static final String NO_ADDS="No ad is currently available matching the requesting parameter.";

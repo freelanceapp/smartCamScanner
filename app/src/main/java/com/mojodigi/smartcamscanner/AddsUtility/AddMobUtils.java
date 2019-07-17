@@ -356,52 +356,56 @@ public class AddMobUtils extends Activity {
         String bannerAddid = addPref.getStringValue(AddConstants.BANNER_ADD_ID, AddConstants.NOT_FOUND);
         boolean showAdd = addPref.getBoolanValue(AddConstants.SHOW_ADD, false);
 
+        try {
 
-        if (!bannerAddid.equalsIgnoreCase(AddConstants.NOT_FOUND) && showAdd) {
-            com.facebook.ads.AdView fbAdView = new com.facebook.ads.AdView(mContext, bannerAddid, com.facebook.ads.AdSize.BANNER_HEIGHT_50);
+            if (!bannerAddid.equalsIgnoreCase(AddConstants.NOT_FOUND) && showAdd) {
+                com.facebook.ads.AdView fbAdView = new com.facebook.ads.AdView(mContext, bannerAddid, com.facebook.ads.AdSize.BANNER_HEIGHT_50);
 
-            final LinearLayout adContainer = activity.findViewById(R.id.banner_container);
-           int count= adContainer.getChildCount();
-            System.out.print(""+count);
-            Log.d("Viewremoved", "Viewremoved count"+count);
-            /// to  tackle add above add issue;
-            if(count>0)
-            {
-                adContainer.removeAllViews();
-                Log.d("Viewremoved", "Viewremoved");
-            }
-            adContainer.addView(fbAdView);
-
-            fbAdView.setAdListener(new com.facebook.ads.AdListener() {
-                @Override
-                public void onError(Ad ad, AdError adError) {
-                    // Ad error callback
-
-                    Log.d("Fberror", "" + adError.getErrorMessage());
+                final LinearLayout adContainer = activity.findViewById(R.id.banner_container);
+                int count = adContainer.getChildCount();
+                System.out.print("" + count);
+                Log.d("Viewremoved", "Viewremoved count" + count);
+                /// to  tackle add above add issue;
+                if (count > 0) {
+                    adContainer.removeAllViews();
+                    Log.d("Viewremoved", "Viewremoved");
                 }
+                adContainer.addView(fbAdView);
 
-                @Override
-                public void onAdLoaded(Ad ad) {
-                    // Ad loaded callback
+                fbAdView.setAdListener(new com.facebook.ads.AdListener() {
+                    @Override
+                    public void onError(Ad ad, AdError adError) {
+                        // Ad error callback
+
+                        Log.d("Fberror", "" + adError.getErrorMessage());
+                    }
+
+                    @Override
+                    public void onAdLoaded(Ad ad) {
+                        // Ad loaded callback
 
 
                         adContainer.setVisibility(View.VISIBLE);
-                }
+                    }
 
-                @Override
-                public void onAdClicked(Ad ad) {
-                    // Ad clicked callback
-                }
+                    @Override
+                    public void onAdClicked(Ad ad) {
+                        // Ad clicked callback
+                    }
 
-                @Override
-                public void onLoggingImpression(Ad ad) {
-                    // Ad impression logged callback
-                }
-            });
+                    @Override
+                    public void onLoggingImpression(Ad ad) {
+                        // Ad impression logged callback
+                    }
+                });
 
-            // Request an ad
-            fbAdView.loadAd();
+                // Request an ad
+                fbAdView.loadAd();
 
+
+            }
+        }catch (Exception e)
+        {
 
         }
     }

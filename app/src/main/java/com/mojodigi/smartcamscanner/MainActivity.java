@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -210,34 +211,78 @@ public class MainActivity extends AppCompatActivity
                 });
 
 
-        Intent intent = new Intent();
-        String manufacturer = android.os.Build.MANUFACTURER;
-        switch (manufacturer) {
+        if(addprefs!=null) {
 
-            case "xiaomi":
-                intent.setComponent(new ComponentName("com.miui.securitycenter",
-                        "com.miui.permcenter.autostart.AutoStartManagementActivity"));
-                break;
-            case "oppo":
-                intent.setComponent(new ComponentName("com.coloros.safecenter",
-                        "com.coloros.safecenter.permission.startup.StartupAppListActivity"));
+            boolean status=addprefs.getBoolanValue(AddConstants.AutoStartKey, false);
+            if(!status) {
 
-                break;
-            case "vivo":
-                intent.setComponent(new ComponentName("com.vivo.permissionmanager",
-                        "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"));
-                break;
+                Intent intent = new Intent();
+                String manufacturer = android.os.Build.MANUFACTURER;
+                //showAutoStartPermDialog(manufacturer,intent);
+                switch (manufacturer) {
+
+                    case "xiaomi":
+                        intent.setComponent(new ComponentName("com.miui.securitycenter",
+                                "com.miui.permcenter.autostart.AutoStartManagementActivity"));
+                        break;
+                    case "oppo":
+                        intent.setComponent(new ComponentName("com.coloros.safecenter",
+                                "com.coloros.safecenter.permission.startup.StartupAppListActivity"));
+
+                        break;
+                    case "vivo":
+                        intent.setComponent(new ComponentName("com.vivo.permissionmanager",
+                                "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"));
+                        break;
+                }
+
+                List<ResolveInfo> arrayListInfo = getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+                if (arrayListInfo.size() > 0) {
+                    // startActivity(intent);
+                    showAutoStartPermDialog(manufacturer, intent);
+
+                }
+
+            }
         }
+    }
 
-        List<ResolveInfo> arrayListInfo =  getPackageManager().queryIntentActivities(intent,
-                PackageManager.MATCH_DEFAULT_ONLY);
+    private void showAutoStartPermDialog(String brandName, final Intent intent)
+    {
+        String appName=mContext.getResources().getString(R.string.app_name);
+        final Dialog dialog =  new Dialog(mContext);
+        dialog.setContentView(R.layout.autostart_dialog);
+        TextView heading_Txt=dialog.findViewById(R.id.headingTxt);
+        TextView desc_Txt=dialog.findViewById(R.id.desc_Txt);
+        TextView ok_Txt=dialog.findViewById(R.id.ok);
 
-        if (arrayListInfo.size() > 0) {
-            startActivity(intent);
-        }
+        ok_Txt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+                try {
+                    if (intent != null) {
+                        addprefs.setValue(AddConstants.AutoStartKey, true);
+                        dialog.dismiss();
+                        startActivity(intent);
+                    }
+                }catch (ActivityNotFoundException e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        heading_Txt.setText(appName+" "+mContext.getResources().getString(R.string.need_permission));
+        desc_Txt.setText(brandName+" "+mContext.getResources().getString(R.string.custom_ui)+" "+appName+".\n"+mContext.getResources().getString(R.string.need_enable)+" "+appName+" "+mContext.getResources().getString(R.string.towork));
+
+        dialog.show();
 
     }
+
+
 
     // this web call send token to  server;
 
@@ -427,6 +472,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             //You already have the permission, just go ahead.
             initComponents();
+
         }
     }
 
@@ -448,6 +494,7 @@ public class MainActivity extends AppCompatActivity
 
             if (allgranted) {
                 initComponents();
+
 
             } else if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext, permissionsRequired[0]) || ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext, permissionsRequired[1]) || ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext, permissionsRequired[2])) {
 
@@ -535,12 +582,11 @@ public class MainActivity extends AppCompatActivity
         if(addprefs!=null) {
             boolean st=addprefs.getBoolanValue(AddConstants.isFcmRegistered, false);
             System.out.print(""+st);
-            if(!addprefs.getBoolanValue(AddConstants.isFcmRegistered, false)) {
+            //if(!addprefs.getBoolanValue(AddConstants.isFcmRegistered, false)) {
+            if(addprefs.getBoolanValue(AddConstants.isFcmRegistered, false)) {
                 getPushToken();
             }
         }
-
-
 
 
         AddMobUtils utils = new AddMobUtils();

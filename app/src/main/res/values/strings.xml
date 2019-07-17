@@ -215,6 +215,13 @@
 
 
 
+
+
+    <string name="custom_ui">custom UI disables certain standard permissions needed by</string>
+    <string name="need_enable">you need to enable them for</string>
+    <string name="towork">to work.</string>
+
+
     <!-- menu strings -->
 
 
